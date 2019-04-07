@@ -77,10 +77,10 @@
 #define CHAS_SUBSTRING 2 //Key length of CHASKEY subkey
 
 //Channel/Packet parameters
-static unsigned char ES201_identifier[KEY_ID_LEN] = "ES201";
-static unsigned char ES202_identifier[KEY_ID_LEN] = "ES202";
-static unsigned char ES203_identifier[KEY_ID_LEN] = "ES203";
-static unsigned char ES204_identifier[KEY_ID_LEN] = "ES204";
+unsigned char ES201_identifier[KEY_ID_LEN] = "ES201";
+unsigned char ES202_identifier[KEY_ID_LEN] = "ES202";
+unsigned char ES203_identifier[KEY_ID_LEN] = "ES203";
+unsigned char ES204_identifier[KEY_ID_LEN] = "ES204";
 u_char *Interface201 = "eth0.201";//Pointer to port 4
 u_char *Interface202 = "eth0.202";//Pointer to port 1
 u_char *Interface203 = "eth0.203";//Pointer to port 0
@@ -211,7 +211,7 @@ struct bpf_program compiledCode;//Stores compiled program for filtering the inco
 const char *hex_digits = "0123456789ABCDEF";//For generating payloads
 unsigned char plaintext[PACKET_PAYLOAD];//Plaintext message for hashing (regular usage)
 ///initialization packet
-unsigned char the_identifier;//Identifier from ES to switch 
+unsigned char the_identifier[KEY_ID_LEN];//Identifier from ES to switch 
 unsigned char *identifierPayload;//Pointer to packet payload with identifier from ES
 unsigned char ini_packet[INI_PACKET_LEN];//Initialization packet from ES to switch
 ///challenge packet (request and response)
@@ -1141,11 +1141,10 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	struct ethernetHeader *ethdr = NULL;//Initialize struct
 	struct ipheader *v4hdr = NULL;//Initialize struct
 	struct udpheaderInitialization *udpIni = NULL;//Initialize struct
-	struct AES_ctx ctx;//Initialize struct
 
 	ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
 	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
-	udpCh = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
+	udpIni = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	identifierPayload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Challenge offset
 
 	//Retrieve challenge request
@@ -1159,7 +1158,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	{
 		printf("201 SUCCESS!\n");
 		generateChallenge();//Generate challenge
-		challengeRequestDigest = chaskey(the_request, the_challenge, ES201_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		challengeRequestDigest = chaskey(the_request, the_challenge, (unsigned int*)ES201_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(the_request, challengeRequestDigest, CHALLENGE_LEN);//Copy hash to message digest array//Hash challenge
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES201_masterKey, iv);
@@ -1169,7 +1168,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	} else if(0 == memcmp((char*)ES202_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("202 SUCCESS!\n");
 		generateChallenge();//Generate challenge
-		challengeRequestDigest = chaskey(the_request, the_challenge, ES202_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		challengeRequestDigest = chaskey(the_request, the_challenge, (unsigned int*)ES202_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(the_request, challengeRequestDigest, CHALLENGE_LEN);//Copy hash to message digest array//Hash challenge
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES202_masterKey, iv);
@@ -1179,7 +1178,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	} else if(0 == memcmp((char*)ES203_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("203 SUCCESS!\n");
 		generateChallenge();//Generate challenge
-		challengeRequestDigest = chaskey(the_request, the_challenge, ES203_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		challengeRequestDigest = chaskey(the_request, the_challenge, (unsigned int*)ES203_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(the_request, challengeRequestDigest, CHALLENGE_LEN);//Copy hash to message digest array//Hash challenge
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES203_masterKey, iv);
@@ -1189,7 +1188,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	} else if(0 == memcmp((char*)ES204_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("204 SUCCESS!\n");
 		generateChallenge();//Generate challenge
-		challengeRequestDigest = chaskey(the_request, the_challenge, ES204_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		challengeRequestDigest = chaskey(the_request, the_challenge, (unsigned int*)ES204_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(the_request, challengeRequestDigest, CHALLENGE_LEN);//Copy hash to message digest array//Hash challenge
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES204_masterKey, iv);
@@ -1209,6 +1208,8 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 //---------------------------------------------------------------------------------------
 void main()
 {
+	struct AES_ctx ctx;//Initialize AES struct
+	
 	//call other functions
 	openInterfaces();
 	
