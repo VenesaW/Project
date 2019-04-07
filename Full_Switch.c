@@ -11,7 +11,7 @@
 #include<string.h>//Defines one variable type, one macro, and various functions for manipulating arrays of characters
 #include<sys/socket.h>//For Socket programming
 #include<sys/time.h>//For timestamp
-#include "aes.h"//For AES
+#include<aes.h>//For AES
 
 #include<assert.h>//Provides a macro called assert which can be used to verify assumptions made by the program and print a diagnostic message if this assumption is false
 #include<errno.h>//Defines macros for reporting and retrieving error conditions
@@ -349,7 +349,7 @@ int initialization_failure;//Error count
  {
    return sbox[num];
  }
- */
+
 #define getSBoxValue(num) (sbox[(num)])
  /*
  static uint8_t getSBoxInvert(uint8_t num)
@@ -463,7 +463,7 @@ static void AddRoundKey(uint8_t round, state_t* state, const uint8_t* RoundKey)
 		{
 			(*state)[i][j] ^= RoundKey[(round * Nb * 4) + (i * Nb) + j];
 		}//end_FOR
-	}end_FOR
+	}//end_FOR
 }//end_ADD_ROUND_KEY
 
 // The SubBytes Function Substitutes the values in the
@@ -965,55 +965,10 @@ unsigned char* chaskey(unsigned char *chaskeyHash, const unsigned char *msg, con
 	v[2] ^= last[2];
 	v[3] ^= last[3];
 
-	memcpy(chaskeyHash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash  
+	memcpy(chaskeyHash, v, HASH_LEN);//copies |hash length| characters from memory area v to memory area hash  
 
 	return(chaskeyHash);
 }//end_CHASKEY-12
-//---------------------------------------------------------------------------------------
-//                OPEN CHANNEL FOR LISTENING
-//---------------------------------------------------------------------------------------
-//1) Check if interfaces are available
-//2) Open selected interface
-	//a) Call function to select interface
-void openInterfaces()
-{
-    //Port 4 (Eth0.201)
-    Channel201 = pcap_open_live(Interface201, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 4
-    pcap_setdirection(Channel201, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel201, &compiledCode, "len >= 47", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
-    pcap_setfilter(Channel201, &compiledCode);//Apply filter to incoming traffic
-//Port 0 (Eth0.202)
-    Channel202 = pcap_open_live(Interface202, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 0
-    pcap_setdirection(Channel202, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel202, &compiledCode, "len >= 47", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
-    pcap_setfilter(Channel202, &compiledCode);//Apply filter to incoming traffic
-//Port 1 (Eth0.203)
-    Channel203 = pcap_open_live(Interface203, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 1
-    pcap_setdirection(Channel203, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel203, &compiledCode, "len >= 47", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
-    pcap_setfilter(Channel203, &compiledCode);//Apply filter to incoming traffic
-//Port 2 (Eth0.204)
-    Channel204 = pcap_open_live(Interface204, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 2
-    pcap_setdirection(Channel204, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel204, &compiledCode, "len >= 47", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
-    pcap_setfilter(Channel204, &compiledCode);//Apply filter to incoming traffic
-
-    //All channels opened or not
-    if ((Channel201 == NULL) || (Channel202 == NULL) || (Channel203 == NULL) || (Channel204 == NULL)) {
-        printf("pcap_open_live() failed due to [%s]\n", errorBuffer);//At least one channel could not be opened
-        exit(EXIT_FAILURE);//Exit program
-    }//endIF
-
-//Start sniffing incoming packets on all ports...//maybe just 1 for now //need to thread/fork this sp the sniff simultaneosly
-//    pcap_loop(Channel201, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 4
-//    pcap_loop(Channel202, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 0
-//    pcap_loop(Channel203, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 1
-    pcap_loop(Channel204, NEXT_INCOMING, initializationHandler, NULL);//Start packet capture on port 2
-
-
-	//Channel is open --> call function to listen for Initialization packet
-
-}//endOPEN_INTERFACES
 //---------------------------------------------------------------------------------------
 //				GENERATE CHALLENGE
 //---------------------------------------------------------------------------------------
@@ -1117,7 +1072,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 
 	ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
 	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
-	udpIni = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
+	udpIni = (struct udpheaderInitialization*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	identifierPayload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Challenge offset
 
 	//Retrieve challenge request
@@ -1176,6 +1131,51 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	}//end_IF_ELSE
 		
 }//end_INITIALIZATION_HANDLER
+//---------------------------------------------------------------------------------------
+//                OPEN CHANNEL FOR LISTENING
+//---------------------------------------------------------------------------------------
+//1) Check if interfaces are available
+//2) Open selected interface
+	//a) Call function to select interface
+void openInterfaces()
+{
+    //Port 4 (Eth0.201)
+    Channel201 = pcap_open_live(Interface201, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 4
+    pcap_setdirection(Channel201, PCAP_D_IN);//Sniff incoming traffic
+    pcap_compile(Channel201, &compiledCode, "len >= 47", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_setfilter(Channel201, &compiledCode);//Apply filter to incoming traffic
+//Port 0 (Eth0.202)
+    Channel202 = pcap_open_live(Interface202, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 0
+    pcap_setdirection(Channel202, PCAP_D_IN);//Sniff incoming traffic
+    pcap_compile(Channel202, &compiledCode, "len >= 47", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_setfilter(Channel202, &compiledCode);//Apply filter to incoming traffic
+//Port 1 (Eth0.203)
+    Channel203 = pcap_open_live(Interface203, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 1
+    pcap_setdirection(Channel203, PCAP_D_IN);//Sniff incoming traffic
+    pcap_compile(Channel203, &compiledCode, "len >= 47", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_setfilter(Channel203, &compiledCode);//Apply filter to incoming traffic
+//Port 2 (Eth0.204)
+    Channel204 = pcap_open_live(Interface204, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 2
+    pcap_setdirection(Channel204, PCAP_D_IN);//Sniff incoming traffic
+    pcap_compile(Channel204, &compiledCode, "len >= 47", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_setfilter(Channel204, &compiledCode);//Apply filter to incoming traffic
+
+    //All channels opened or not
+    if ((Channel201 == NULL) || (Channel202 == NULL) || (Channel203 == NULL) || (Channel204 == NULL)) {
+        printf("pcap_open_live() failed due to [%s]\n", errorBuffer);//At least one channel could not be opened
+        exit(EXIT_FAILURE);//Exit program
+    }//endIF
+
+//Start sniffing incoming packets on all ports...//maybe just 1 for now //need to thread/fork this sp the sniff simultaneosly
+//    pcap_loop(Channel201, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 4
+//    pcap_loop(Channel202, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 0
+//    pcap_loop(Channel203, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 1
+    pcap_loop(Channel204, NEXT_INCOMING, initializationHandler, NULL);//Start packet capture on port 2
+
+
+	//Channel is open --> call function to listen for Initialization packet
+
+}//endOPEN_INTERFACES
  //---------------------------------------------------------------------------------------
 //                MAIN
 //---------------------------------------------------------------------------------------
