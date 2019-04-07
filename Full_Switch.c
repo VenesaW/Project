@@ -11,7 +11,7 @@
 #include<string.h>//Defines one variable type, one macro, and various functions for manipulating arrays of characters
 #include<sys/socket.h>//For Socket programming
 #include<sys/time.h>//For timestamp
-#include<aes.h>//For AES
+#include "aes.h"//For AES
 
 #include<assert.h>//Provides a macro called assert which can be used to verify assumptions made by the program and print a diagnostic message if this assumption is false
 #include<errno.h>//Defines macros for reporting and retrieving error conditions
@@ -242,7 +242,6 @@ struct udpheaderOKDF {
 	unsigned short udp_checksum;//UDP checksum (optional)
 	unsigned char okdf_output;//OKDF output
 };
-struct AES_ctx ctx;//Initialize AES struct
 //---------------------------------------------------------------------------------------
 //                GLOBAL DECLARATIONS
 //---------------------------------------------------------------------------------------
@@ -1069,6 +1068,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	struct ethernetHeader *ethdr = NULL;//Initialize struct
 	struct ipheader *v4hdr = NULL;//Initialize struct
 	struct udpheaderInitialization *udpIni = NULL;//Initialize struct
+	struct AES_ctx ctx;//Initialize AES struct
 
 	ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
 	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
