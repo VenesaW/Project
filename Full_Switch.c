@@ -195,6 +195,7 @@ unsigned char subString[CHAS_SUBSTRING];//holds keyStream during trasnformation 
 
 unsigned int chaskeySubkey1[KEY_LEN];//subkey1
 unsigned int chaskeySubkey2[KEY_LEN];//subkey2
+const unsigned int chaskeyMsgLen;
 
 //For channel
 bpf_u_int32 netMask;//Subnet mask
@@ -226,8 +227,8 @@ unsigned char the_response[CHALLENGE_LEN];//Challenge response
 ///accept/deny packet
 unsigned char *accept_reject;//Pointer to packet payload with response from Switch
 unsigned char accept_packet[ACC_DENY_LEN];//Array to hold accept or deny reponse packet
-unsigned char acceptConnection[] = { 'A','C','C','E','P','T' };
-unsigned char AcceptDeny[];//Array to hold accept packet payload
+unsigned char acceptConnection[ACCEPT_DENY_LEN];
+unsigned char AcceptDeny[ACC_DENY_LEN];//Array to hold accept packet payload
 ///key establishment packets
 unsigned char *keyEST_mg1;//Pointer to packet payload with key establishment message 1
 unsigned char *keyEST_mg2;//Pointer to packet payload with key establishment message 2
@@ -888,10 +889,11 @@ void subkeys(unsigned int subkey1[4], unsigned int subkey2[4], const unsigned in
 
 //Calculation of MAC
 //Parameters: pointer to hash, hash length,  message, message length, key, subkey 1, subkey 2
-void chaskey(unsigned char *hash, unsigned int hashLen, const unsigned char *msg, const unsigned int msgLen, const unsigned int key[4], const unsigned int subkey1[4], const unsigned int subkey2[4])
+unsigned char* chaskey(unsigned char *chaskeyHash, const unsigned char *msg, const unsigned int key[4], const unsigned int subkey1[4], const unsigned int subkey2[4])
 {
+	chaskeyMsgLen = PACKET_PAYLOAD;
 	const unsigned int *M = (unsigned int*)msg;
-	const unsigned int *end = M + (((msgLen - 1) >> 4) << 2); /* pointer to last message block */
+	const unsigned int *end = M + (((chaskeyMsgLen - 1) >> 4) << 2); /* pointer to last message block */
 
 	const unsigned int *last;
 	unsigned char lb[16];
@@ -901,24 +903,24 @@ void chaskey(unsigned char *hash, unsigned int hashLen, const unsigned char *msg
 	int i;
 	unsigned char *p;
 
-	assert(hashLen <= 16);//verify hash length is less than or equal to 16
+	assert(HASH_LEN <= 16);//verify hash length is less than or equal to 16
 
 	v[0] = key[0];//pass key character into 
 	v[1] = key[1];
 	v[2] = key[2];
 	v[3] = key[3];
 
-	if (msgLen != 0)
+	if (chaskeyMsgLen != 0)
 	{
 		for (; M != end; M += 4)
 		{
 			//If compiling in debug mode
 #ifdef DEBUG
-			printf("(%3d) v[0] %08x\n", mlen, v[0]);
-			printf("(%3d) v[1] %08x\n", mlen, v[1]);
-			printf("(%3d) v[2] %08x\n", mlen, v[2]);
-			printf("(%3d) v[3] %08x\n", mlen, v[3]);
-			printf("(%3d) compress %08x %08x %08x %08x\n", mlen, m[0], m[1], m[2], m[3]);
+			printf("(%3d) v[0] %08x\n", chaskeyMsgLen, v[0]);
+			printf("(%3d) v[1] %08x\n", chaskeyMsgLen, v[1]);
+			printf("(%3d) v[2] %08x\n", chaskeyMsgLen, v[2]);
+			printf("(%3d) v[3] %08x\n", chaskeyMsgLen, v[3]);
+			printf("(%3d) compress %08x %08x %08x %08x\n", chaskeyMsgLen, msg[0], msg[1], msg[2], msg[3]);
 #endif
 			//assign value using Bitwise exclusive OR
 			v[0] ^= M[0];
@@ -930,7 +932,7 @@ void chaskey(unsigned char *hash, unsigned int hashLen, const unsigned char *msg
 		}//end_FOR
 	}//end_IF
 
-	if ((msgLen != 0) && ((msgLen & 0xF) == 0))
+	if ((chaskeyMsgLen != 0) && ((chaskeyMsgLen & 0xF) == 0))
 	{
 		last = subkey1;
 		lastblock = M;
@@ -941,7 +943,7 @@ void chaskey(unsigned char *hash, unsigned int hashLen, const unsigned char *msg
 		p = (unsigned char*)M;
 		i = 0;
 
-		for (; p != msg + msgLen; p++, i++)
+		for (; p != msg + chaskeyMsgLen; p++, i++)
 		{
 			lb[i] = *p;
 		}//end_FOR
@@ -958,11 +960,11 @@ void chaskey(unsigned char *hash, unsigned int hashLen, const unsigned char *msg
 
 	//If compiling in debug mode
 #ifdef DEBUG
-	printf("(%3d) v[0] %08x\n", mlen, v[0]);
-	printf("(%3d) v[1] %08x\n", mlen, v[1]);
-	printf("(%3d) v[2] %08x\n", mlen, v[2]);
-	printf("(%3d) v[3] %08x\n", mlen, v[3]);
-	printf("(%3d) last block %08x %08x %08x %08x\n", mlen, lastblock[0], lastblock[1], lastblock[2], lastblock[3]);
+	printf("(%3d) v[0] %08x\n", chaskeyMsgLen, v[0]);
+	printf("(%3d) v[1] %08x\n", chaskeyMsgLen, v[1]);
+	printf("(%3d) v[2] %08x\n", chaskeyMsgLen, v[2]);
+	printf("(%3d) v[3] %08x\n", chaskeyMsgLen, v[3]);
+	printf("(%3d) last block %08x %08x %08x %08x\n", chaskeyMsgLen, lastblock[0], lastblock[1], lastblock[2], lastblock[3]);
 #endif
 	v[0] ^= lastblock[0];
 	v[1] ^= lastblock[1];
@@ -978,10 +980,10 @@ void chaskey(unsigned char *hash, unsigned int hashLen, const unsigned char *msg
 
 	//If compiling in debug mode
 #ifdef DEBUG
-	printf("(%3d) v[0] %08x\n", mlen, v[0]);
-	printf("(%3d) v[1] %08x\n", mlen, v[1]);
-	printf("(%3d) v[2] %08x\n", mlen, v[2]);
-	printf("(%3d) v[3] %08x\n", mlen, v[3]);
+	printf("(%3d) v[0] %08x\n", chaskeyMsgLen, v[0]);
+	printf("(%3d) v[1] %08x\n", chaskeyMsgLen, v[1]);
+	printf("(%3d) v[2] %08x\n", chaskeyMsgLen, v[2]);
+	printf("(%3d) v[3] %08x\n", chaskeyMsgLen, v[3]);
 #endif
 
 	//assignment by Bitwise exclusive OR
@@ -990,24 +992,9 @@ void chaskey(unsigned char *hash, unsigned int hashLen, const unsigned char *msg
 	v[2] ^= last[2];
 	v[3] ^= last[3];
 
-	memcpy(hash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash  
+	memcpy(chaskeyHash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash  
 
-	int hashLoop;
-
-	printf("\n");//Print on next line
-
-	for (hashLoop = 0; hashLoop < hashLen; hashLoop++)
-	{
-		//Start printing on the next after every 16 octets
-		if ((hashLoop % 16) == 0)
-		{
-			printf("\n");//Print on next line
-		}//endIF
-		printf("%x", hash[hashLoop]);//Print in hexadecimal format
-	}//endFOR*/
-
-	printf("\n");//Print on next line
-
+	return(chaskeyHash);
 }//end_CHASKEY-12
 //---------------------------------------------------------------------------------------
 //                OPEN CHANNEL FOR LISTENING
