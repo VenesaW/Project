@@ -456,7 +456,6 @@ void AES_init_ctx_iv(struct AES_ctx* ctx, const uint8_t* key, const uint8_t* iv)
 {
 	KeyExpansion(ctx->RoundKey, key);
 	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
-	printf("\nOK\n");
 }//end_AES_INIT_CTX_IV
 
 void AES_ctx_set_iv(struct AES_ctx* ctx, const uint8_t* iv)
@@ -731,7 +730,6 @@ void AES_CBC_encrypt_buffer(struct AES_ctx *ctx, uint8_t* buf, uint32_t length)
 	}//end_FOR
 	/* store Iv in ctx for next call */
 	memcpy(ctx->Iv, Iv, AES_BLOCKLEN);
-	printf("\nOK\n");
 }//end_AES_CBC_ENCRYPT_BUFFER
 
 void AES_CBC_decrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, uint32_t length)
@@ -1118,11 +1116,6 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES204_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
-		printf("\nCIPHER:\n");
-		int cnt;
-		for(cnt =0; cnt < 64; cnt++){
-			printf("%x", the_request[cnt]);
-		}
 		challengeRequestPacket();//Generate packet
 		pcap_sendpacket(Channel204, crq_packet, CHALLENGE_REQUEST_LEN);//Challenge request packet
 	} else {
