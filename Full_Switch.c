@@ -1116,6 +1116,11 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES204_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
+		println("\nCIPHER:\n")
+		int cnt;
+		for(cnt =0; cnt < 64; cnt++){
+			println("%x", the_request[cnt]);
+		}
 		challengeRequestPacket();//Generate packet
 		pcap_sendpacket(Channel204, crq_packet, CHALLENGE_REQUEST_LEN);//Challenge request packet
 	} else {
