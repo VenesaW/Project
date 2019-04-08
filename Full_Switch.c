@@ -269,6 +269,7 @@ unsigned char subString[CHAS_SUBSTRING];//holds keyStream during trasnformation 
 unsigned int chaskeySubkey1[KEY_LEN];//subkey1
 unsigned int chaskeySubkey2[KEY_LEN];//subkey2
 unsigned int chaskeyMsgLen;
+unsigned int hashLen = 8;
 
 //For channel
 bpf_u_int32 netMask;//Subnet mask
@@ -894,7 +895,7 @@ void chaskey(unsigned char *hash, const unsigned char *msg, const unsigned int k
 	v[2] = key[2];
 	v[3] = key[3];
 
-	if (msgLen != 0)
+	if (chaskeyMsgLen != 0)
 	{
 		for (; M != end; M += 4)
 		{
