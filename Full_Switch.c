@@ -1087,7 +1087,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 		AES_init_ctx_iv(&ctx, ES201_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
 		challengeRequestPacket();//Generate packet
-		pcap_sendpacket(Channel201, crq_packet, INI_PACKET_LEN);//Challenge request packet
+		pcap_sendpacket(Channel201, crq_packet, CHALLENGE_REQUEST_LEN);//Challenge request packet
 	} else if(0 == memcmp((char*)ES202_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("202 SUCCESS!\n");
 		generateChallenge();//Generate challenge
@@ -1097,7 +1097,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 		AES_init_ctx_iv(&ctx, ES202_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
 		challengeRequestPacket();//Generate packet
-		pcap_sendpacket(Channel202, crq_packet, INI_PACKET_LEN);//Challenge request packet
+		pcap_sendpacket(Channel202, crq_packet, CHALLENGE_REQUEST_LEN);//Challenge request packet
 	} else if(0 == memcmp((char*)ES203_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("203 SUCCESS!\n");
 		generateChallenge();//Generate challenge
@@ -1107,7 +1107,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 		AES_init_ctx_iv(&ctx, ES203_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
 		challengeRequestPacket();//Generate packet
-		pcap_sendpacket(Channel203, crq_packet, INI_PACKET_LEN);//Challenge request packet
+		pcap_sendpacket(Channel203, crq_packet, CHALLENGE_REQUEST_LEN);//Challenge request packet
 	} else if(0 == memcmp((char*)ES204_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("204 SUCCESS!\n");
 		generateChallenge();//Generate challenge
@@ -1117,7 +1117,7 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 		AES_init_ctx_iv(&ctx, ES204_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
 		challengeRequestPacket();//Generate packet
-		pcap_sendpacket(Channel204, crq_packet, INI_PACKET_LEN);//Challenge request packet
+		pcap_sendpacket(Channel204, crq_packet, CHALLENGE_REQUEST_LEN);//Challenge request packet
 	} else {
 		//otherwise --> close channel
 		printf("ERORR!\n");
