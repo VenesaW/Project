@@ -296,7 +296,7 @@ unsigned char *challengeResponseDigest;//Pointer to calculated message digest fo
 unsigned char crq_packet[CHALLENGE_REQUEST_LEN];//Challenge request packet
 unsigned char crp_packet[CHALLENGE_RESPONSE_LEN];//Challenge response packet
 unsigned char the_challenge[CHALLENGE_LEN];//Challenge request in payload
-unsigned char the_request[CHALLENGE_LEN];//Challenge request
+unsigned char the_request[] = " ";//Challenge request
 unsigned char the_response[CHALLENGE_LEN];//Challenge response
 ///accept/deny packet
 unsigned char *accept_reject;//Pointer to packet payload with response from Switch
@@ -456,6 +456,7 @@ void AES_init_ctx_iv(struct AES_ctx* ctx, const uint8_t* key, const uint8_t* iv)
 {
 	KeyExpansion(ctx->RoundKey, key);
 	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
+	printf("\nOK\n");
 }//end_AES_INIT_CTX_IV
 
 void AES_ctx_set_iv(struct AES_ctx* ctx, const uint8_t* iv)
@@ -730,6 +731,7 @@ void AES_CBC_encrypt_buffer(struct AES_ctx *ctx, uint8_t* buf, uint32_t length)
 	}//end_FOR
 	/* store Iv in ctx for next call */
 	memcpy(ctx->Iv, Iv, AES_BLOCKLEN);
+	printf("\nOK\n");
 }//end_AES_CBC_ENCRYPT_BUFFER
 
 void AES_CBC_decrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, uint32_t length)
