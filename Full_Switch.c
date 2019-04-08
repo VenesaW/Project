@@ -963,12 +963,14 @@ void chaskey(unsigned char *hash, const unsigned char *msg, const unsigned int k
 //---------------------------------------------------------------------------------------
 //				GENERATE CHALLENGE
 //---------------------------------------------------------------------------------------
-void generateChallenge (){
-			
+void generateChallenge ()
+{	
+	printf("\nChallenge:\n");
 	for (getChallenge = 0; getChallenge < CHALLENGE_LEN; getChallenge++)
 	{
 		the_challenge[getChallenge] = hex_digits[(rand() % 256)];//Generate challenge
 		the_request[getChallenge] = the_challenge[getChallenge];
+		printf("%c",the_request[getChallenge]);
 	}//endFOR
 }//end_GENERATEE_CHALLENGE
 //---------------------------------------------------------------------------------------
@@ -1116,6 +1118,12 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES204_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
+		printf("\nEncrypted:\n");
+		int cntr;
+		for (cntr = 0; cntr < 64; cntr++)
+		{
+			printf("%c",the_request[cntr]);
+		}//endFOR
 		challengeRequestPacket();//Generate packet
 		pcap_sendpacket(Channel204, crq_packet, CHALLENGE_REQUEST_LEN);//Challenge request packet
 	} else {
