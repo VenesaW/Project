@@ -252,9 +252,9 @@ char* ES202_Key = "AA112233445566778899AABBCCDDEEFF";//pointer to master key (en
 char* ES203_Key = "AA112233445566778899AABBCCDDEEFF";//pointer to master key (encryption and decryption) as a character stream
 char* ES204_Key = "AA112233445566778899AABBCCDDEEFF";//pointer to master key (encryption and decryption) as a character stream
 unsigned char ES201_masterKey[KEY_LEN];//master key as hex
-unsigned char ES202_masterKey[Key_LEN];//master key as hex
-unsigned char ES203_masterKey[Key_LEN];//master key as hex
-unsigned char ES204_masterKey[Key_LEN];//master key as hex
+unsigned char ES202_masterKey[KEY_LEN];//master key as hex
+unsigned char ES203_masterKey[KEY_LEN];//master key as hex
+unsigned char ES204_masterKey[KEY_LEN];//master key as hex
 unsigned char subString[SUB_STR_LEN];//holds key during trasnformation from cracter string to hex format
 
 unsigned char iv[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
@@ -1100,8 +1100,8 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	{
 		printf("201 SUCCESS!\n");
 		generateChallenge();//Generate challenge
-		subkeys(chaskeySubkey1, chaskeySubkey2, ES201_masterKey);
-		chaskey(hash, the_challenge, ES201_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		subkeys(chaskeySubkey1, chaskeySubkey2, (unsigned int*)ES201_masterKey);
+		chaskey(hash, the_challenge, (unsigned int*)ES201_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES201_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
@@ -1110,8 +1110,8 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	} else if(0 == memcmp((char*)ES202_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("202 SUCCESS!\n");
 		generateChallenge();//Generate challenge
-		subkeys(chaskeySubkey1, chaskeySubkey2, ES202_masterKey);
-		challengeRequestDigest = chaskey(hash, the_challenge, ES202_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		subkeys(chaskeySubkey1, chaskeySubkey2, (unsigned int*)ES202_masterKey);
+		challengeRequestDigest = chaskey(hash, the_challenge, (unsigned int*)ES202_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES202_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
@@ -1120,8 +1120,8 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	} else if(0 == memcmp((char*)ES203_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("203 SUCCESS!\n");
 		generateChallenge();//Generate challenge
-		subkeys(chaskeySubkey1, chaskeySubkey2, ES203_masterKey);
-		challengeRequestDigest = chaskey(hash, the_challenge, ES203_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		subkeys(chaskeySubkey1, chaskeySubkey2, (unsigned int*)ES203_masterKey);
+		challengeRequestDigest = chaskey(hash, the_challenge, (unsigned int*)ES203_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES203_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
@@ -1130,8 +1130,8 @@ void initializationHandler(u_char *Uselesspointr, const struct pcap_pkthdr *head
 	} else if(0 == memcmp((char*)ES204_identifier, (char*)the_identifier, KEY_ID_LEN)){
 		printf("204 SUCCESS!\n");
 		generateChallenge();//Generate challenge
-		subkeys(chaskeySubkey1, chaskeySubkey2, ES204_masterKey);
-		challengeRequestDigest = chaskey(hash, the_challenge, ES204_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		subkeys(chaskeySubkey1, chaskeySubkey2, (unsigned int*)ES204_masterKey);
+		challengeRequestDigest = chaskey(hash, the_challenge, (unsigned int*)ES204_masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		//Encrypt challenge
 		AES_init_ctx_iv(&ctx, ES204_masterKey, iv);
 		AES_CBC_encrypt_buffer(&ctx, the_request, AES_BLOCK);
@@ -1192,7 +1192,7 @@ void openInterfaces()
 //---------------------------------------------------------------------------------------
 //					FORMAT MASTER KEYS FROM CHARACTER STREAM TO HEX
 //---------------------------------------------------------------------------------------
-void formatMasterKeys
+void formatMasterKeys()
 {
 	//ES201 master key
 	memcpy(subString, ES201_Key, 2);
