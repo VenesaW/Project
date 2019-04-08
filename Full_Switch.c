@@ -850,26 +850,7 @@ const volatile unsigned int C[2] = { 0x00, 0x87 };//bit string (0^126)(10), whic
 void subkeys(unsigned int subkey1[4], unsigned int subkey2[4], const unsigned int key[4])
 {
 	TIMESTWO(subkey1, key);
-	int skey;
-
-	for (skey = 0; skey < sizeof(key); skey++)
-	{
-		printf("%x", key[skey]);//Print in hexadecimal format
-	}//endFOR*/
-	printf("\n");//Print on next line
-
-	for (skey = 0; skey < sizeof(subkey1); skey++)
-	{
-		printf("%x", subkey1[skey]);//Print in hexadecimal format
-	}//endFOR*/
-	printf("\n");//Print on next line
-
 	TIMESTWO(subkey2, subkey1);
-	for (skey = 0; skey < sizeof(subkey2); skey++)
-	{
-		printf("%x", subkey2[skey]);//Print in hexadecimal format
-	}//endFOR*/
-	printf("\n");//Print on next line
 }//end_SUBKEYS
 
 //Calculation of MAC
