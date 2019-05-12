@@ -219,6 +219,7 @@ struct bpf_program compiledCode;//Stores compiled program for filtering the inco
 const char *hex_digits = "0123456789ABCDEF";//For generating payloads
 unsigned char plaintext[PACKET_PAYLOAD];//Plaintext message for hashing (regular usage)
 ///key establishment packets
+unsigned char *ES_randNum;//Pointer to random number from ES in key establishment message 1
 unsigned char *keyEST1_payload;//Pointer to packet payload with key establishment message 1
 unsigned char *keyEST_msg3;//Pointer to packet payload with key establishment message 3
 unsigned char msg2_concat[MSG2_CONCAT_LEN];//Array to hold concatenated message 2
@@ -1047,7 +1048,8 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
     ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
     v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
     udpMsg1 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
-    keyEST1_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Challenge offset
+    keyEST1_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
+    ES_randNum = (u_char *)(packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP + RANDOM_NUM_LEN);//Hash offset
 
     //Retrieve Key Establishment message 1 payload
     for (getPayload = OFFSET; getPayload < RANDOM_NUM_LEN; getPayload++)
