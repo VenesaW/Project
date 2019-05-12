@@ -1049,7 +1049,7 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
     v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
     udpMsg1 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
     keyEST1_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
-    ES_randNum = (u_char *)(packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP + RANDOM_NUM_LEN);//Hash offset
+    ES_randNum = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP + RANDOM_NUM_LEN);//Hash offset
 
     //Retrieve Key Establishment message 1 payload
     for (getPayload = OFFSET; getPayload < RANDOM_NUM_LEN; getPayload++)
