@@ -219,7 +219,6 @@ struct bpf_program compiledCode;//Stores compiled program for filtering the inco
 const char *hex_digits = "0123456789ABCDEF";//For generating payloads
 unsigned char plaintext[PACKET_PAYLOAD];//Plaintext message for hashing (regular usage)
 ///key establishment packets
-unsigned char *ES_randNum;//Pointer to random number from ES in key establishment message 1
 unsigned char *keyEST1_payload;//Pointer to packet payload with key establishment message 1
 unsigned char *keyEST_msg3;//Pointer to packet payload with key establishment message 3
 unsigned char msg2_concat[MSG2_CONCAT_LEN];//Array to hold concatenated message 2
@@ -1049,15 +1048,14 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
     v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
     udpMsg1 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
     keyEST1_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
-    ES_randNum = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP + RANDOM_NUM_LEN);//Hash offset
 
     //Retrieve Key Establishment message 1 payload
     for (getPayload = OFFSET; getPayload < RANDOM_NUM_LEN; getPayload++)
     {
-        //msg_packet1[getPayload] = 1;
-        //printf("\n%s",msg_packet1[getPayload]);
-        //keyEST_msg1[getPayload];//Fill payload array for decryption
-        printf("\n%s",keyEST1_payload[getPayload]);
+        //msg_packet1[getPayload] = keyEST1_payload[getPayload];//Fill payload array for decryption
+        msg_packet1[getPayload] = 1;
+        printf("\n%d",msg_packet1[getPayload]);
+        //printf("\n%s",keyEST1_payload[getPayload]);
     }//endFOR
     
     //Create and send KDF Message 2
@@ -1080,7 +1078,7 @@ void openInterfaces()
 //Port 0 (Eth0.202)
     Channel202 = pcap_open_live(Interface202, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 0
     pcap_setdirection(Channel202, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel202, &compiledCode, "port 1045 ", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_compile(Channel202, &compiledCode, "port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
     pcap_setfilter(Channel202, &compiledCode);//Apply filter to incoming traffic
 //Port 1 (Eth0.203)
     Channel203 = pcap_open_live(Interface203, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 1
