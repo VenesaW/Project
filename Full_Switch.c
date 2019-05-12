@@ -175,7 +175,7 @@ struct udpheader {
     unsigned short dest_port;//Destination port number
     unsigned short udp_length;//UDP packet length
     unsigned short udp_checksum;//UDP checksum (optional)
-	unsigned char udp_payload;//UDP payload
+    unsigned char udp_payload;//UDP payload
 };
 //---------------------------------------------------------------------------------------
 //                GLOBAL DECLARATIONS
@@ -1044,21 +1044,18 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
     struct ipheader *v4hdr = NULL;//Initialize struct
     struct udpheader *udpMsg1 = NULL;//Initialize struct
 
-    printf("\nStructs initialized\n");
-
     ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
     v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
     udpMsg1 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
     keyEST_msg1 = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Challenge offset
 
-    printf("\nParameters sorted\n");
-
     //Retrieve Key Establishment message 1 payload
     for (getPayload = OFFSET; getPayload < RANDOM_NUM_LEN; getPayload++)
     {
-        printf("\nInside for loop\n");
-        msg_packet1[getPayload] = keyEST_msg1[getPayload];//Fill payload array for decryption
+        msg_packet1[getPayload] = 1;
+        keyEST_msg1[getPayload];//Fill payload array for decryption
         printf("\n%s",msg_packet1[getPayload]);
+        printf("\n%s",keyEST_msg1[getPayload]);
     }//endFOR
     
     //Create and send KDF Message 2
