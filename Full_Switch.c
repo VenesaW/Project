@@ -1055,7 +1055,7 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
         //msg_packet1[getPayload] = 1;
         //printf("\n%s",msg_packet1[getPayload]);
         //keyEST_msg1[getPayload];//Fill payload array for decryption
-        printf("\n%s",keyEST_msg1[getPayload]);
+        printf("\n%s",keyEST1_payload[getPayload]);
     }//endFOR
     
     //Create and send KDF Message 2
