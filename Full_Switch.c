@@ -224,6 +224,7 @@ unsigned char *keyEST_msg3;//Pointer to packet payload with key establishment me
 unsigned char msg2_concat[MSG2_CONCAT_LEN];//Array to hold concatenated message 2
 unsigned char msg3_concat[MSG3_CONCAT_LEN];//Array to hold concatenated message 3
 unsigned char msg2_packet[KEY_EST_MSG2_LEN];//Array to hold key establishment message 2 packet
+unsigned char msg_packet1[RANDOM_NUM_LEN];//Array to hold message 1 packet payload
 unsigned char msg_packet2[MSG2_CONCAT_LEN];//Array to hold message 2 packet payload
 ///key establishment parameters
 unsigned char random_numberES[RANDOM_NUM_LEN];
@@ -1046,7 +1047,7 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
 
     ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
     v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
-    udpMsg1 = (struct udpheaderMsg1*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
+    udpMsg1 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
     keyEST_msg1 = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Challenge offset
 
     //Retrieve Key Establishment message 1 payload
