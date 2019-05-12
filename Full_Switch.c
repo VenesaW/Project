@@ -1043,7 +1043,6 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
     struct ethernetHeader *ethdr = NULL;//Initialize struct
     struct ipheader *v4hdr = NULL;//Initialize struct
     struct udpheader *udpMsg1 = NULL;//Initialize struct
-    struct keyEST_msg1 *KEmsg1 = NULL;//Initialize struct
 
     ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
     v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
