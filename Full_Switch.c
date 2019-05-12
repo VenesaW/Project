@@ -219,7 +219,7 @@ struct bpf_program compiledCode;//Stores compiled program for filtering the inco
 const char *hex_digits = "0123456789ABCDEF";//For generating payloads
 unsigned char plaintext[PACKET_PAYLOAD];//Plaintext message for hashing (regular usage)
 ///key establishment packets
-unsigned char *keyEST_msg1;//Pointer to packet payload with key establishment message 1
+unsigned char *keyEST1_payload;//Pointer to packet payload with key establishment message 1
 unsigned char *keyEST_msg3;//Pointer to packet payload with key establishment message 3
 unsigned char msg2_concat[MSG2_CONCAT_LEN];//Array to hold concatenated message 2
 unsigned char msg3_concat[MSG3_CONCAT_LEN];//Array to hold concatenated message 3
@@ -1047,14 +1047,14 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
     ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
     v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
     udpMsg1 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
-    keyEST_msg1 = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Challenge offset
+    keyEST1_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Challenge offset
 
     //Retrieve Key Establishment message 1 payload
     for (getPayload = OFFSET; getPayload < RANDOM_NUM_LEN; getPayload++)
     {
-        msg_packet1[getPayload] = 1;
-        printf("\n%s",msg_packet1[getPayload]);
-        keyEST_msg1[getPayload];//Fill payload array for decryption
+        //msg_packet1[getPayload] = 1;
+        //printf("\n%s",msg_packet1[getPayload]);
+        //keyEST_msg1[getPayload];//Fill payload array for decryption
         printf("\n%s",keyEST_msg1[getPayload]);
     }//endFOR
     
