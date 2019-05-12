@@ -1053,7 +1053,7 @@ void handleKDF_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, con
     //Retrieve Key Establishment message 1 payload
     for (getPayload = OFFSET; getPayload < RANDOM_NUM_LEN; getPayload++)
     {
-        msg_packet1[getPayload] = random_numberES[getPayload];//Fill payload array for decryption
+        msg_packet1[getPayload] = keyEST_msg1[getPayload];//Fill payload array for decryption
         printf("\n%s",msg_packet1[getPayload]);
     }//endFOR
     
