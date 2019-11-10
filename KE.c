@@ -844,7 +844,12 @@ void chaskey(unsigned char *hash, const unsigned char *msg, const unsigned int k
 	v[2] ^= last[2];
 	v[3] ^= last[3];
 
-	memcpy(hash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash  
+	memcpy(hash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash 
+
+	for (getData = 0; getData < hashLen; getData++)
+	{
+		printf("%02x", hash[getData]);
+	}
 }//end_CHASKEY-12
 
 //---------------------------------------------------------------------------------------
@@ -885,6 +890,7 @@ void main()
 	memcpy(h + 60, u, 20);
 	chaskeyMsgLen = 80;
 
+	printf("\nSession Key:\n");
 	for (c = 1; c <= d; c++)
 	{
 		if (c == 1)
@@ -908,12 +914,13 @@ void main()
 			{
 				printf("%02x", z[getData]);
 			}*/
-			
+
 		}
 	}//FOR
 
 	memcpy(b, z, 16);
-	
+
+	/*
 	printf("\nSession Key:\n");
 	for (getData = 0; getData < 16; getData++)
 	{
@@ -921,5 +928,6 @@ void main()
 	}
 	printf("\n\n");
 	printf("\n\n");
+	*/
 
 }//end_MAIN
