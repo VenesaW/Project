@@ -893,22 +893,22 @@ void openInterfaces()
     //Port 4 (Eth0.201)
     Channel201 = pcap_open_live(Interface201, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 4
     pcap_setdirection(Channel201, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel201, &compiledCode, "len >= 66", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_compile(Channel201, &compiledCode, "port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
     pcap_setfilter(Channel201, &compiledCode);//Apply filter to incoming traffic
 //Port 0 (Eth0.202)
     Channel202 = pcap_open_live(Interface202, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 0
     pcap_setdirection(Channel202, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel202, &compiledCode, "len >= 66", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_compile(Channel202, &compiledCode, "port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
     pcap_setfilter(Channel202, &compiledCode);//Apply filter to incoming traffic
 //Port 1 (Eth0.203)
     Channel203 = pcap_open_live(Interface203, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 1
     pcap_setdirection(Channel203, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel203, &compiledCode, "len >= 66", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_compile(Channel203, &compiledCode, "port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
     pcap_setfilter(Channel203, &compiledCode);//Apply filter to incoming traffic
 //Port 2 (Eth0.204)
     Channel204 = pcap_open_live(Interface204, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 2
     pcap_setdirection(Channel204, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel204, &compiledCode, "len >= 66", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+    pcap_compile(Channel204, &compiledCode, "port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
     pcap_setfilter(Channel204, &compiledCode);//Apply filter to incoming traffic
 
     //All channels opened or not
@@ -1536,7 +1536,6 @@ void KE_secondMessage()
 //---------------------------------------------------------------------------------------
 void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_char *in_packet)
 {
-	printf("listening\n");
 	struct ethernetHeader *ethdr = NULL;//Initialize struct
 	struct ipheader *v4hdr = NULL;//Initialize struct
 	struct udpheader *udpMsg2 = NULL;//Initialize struct
