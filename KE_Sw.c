@@ -43,8 +43,8 @@
 
 //Packet lengths (total)
 #define KEY_EST_MSG2_LEN 98 //Length of KEY EST MSG 3 packet
-#define KEY_EST_MSG4_LEN 74 //Length of KEY EST MSG 5 packet
-#define KEY_EST_MSG5_LEN 18 //Length of KEY EST MSG 5 packet
+#define KEY_EST_MSG5_LEN 74 //Length of KEY EST MSG 5 packet
+#define KEY_EST_MSG67_LEN 18 //Length of KEY EST MSG 5 packet
 #define NONCE_LEN 8 //8 Byte random number (Nonce) for key establishment
 #define RANDOM_NUM_LEN 8 //8 Byte random number (Nonce) for key establishment
 #define KEYING_MAT_LEN 16 //16 Byte keying material for key establishment
@@ -1096,7 +1096,7 @@ void handleKE_Msg5(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 
 	ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
 	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
-	udpMsg2 = (struct udpheaderMsg2*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
+	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
 
 	//Retrieve message 5 payload challenge response
