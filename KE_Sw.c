@@ -1551,9 +1551,9 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
 	
-	printf("\n---------------------------------------------------------------------\n");
-    printf("Grabbed packet of length %d\n", header->len);
-	printf("\n---------------------------------------------------------------------\n");
+	//printf("\n---------------------------------------------------------------------\n");
+    //printf("Grabbed packet of length %d\n", header->len);
+	//printf("\n---------------------------------------------------------------------\n");
 
 	//Retrieve message 1 payload
 	for (getData = OFFSET; getData < MSG1_PAYLOAD_LEN; getData++)
@@ -1566,6 +1566,7 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	for (getData = 1; getData < MSG1_PAYLOAD_LEN; getData++)
 	{
 		ES_RandomNum[appendData] = ES_payload[getData];//Fill payload array for decryption
+		printf("%02x", ES_RandomNum[appendData]);
 		appendData++;
 	}//endFOR
 	
