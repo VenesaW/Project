@@ -1566,7 +1566,7 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	for (getData = 1; getData < MSG1_PAYLOAD_LEN; getData++)
 	{
 		ES_RandomNum[appendData] = ES_payload[getData];//Fill payload array for decryption
-		printf("%02x", ES_RandomNum[appendData]);
+		printf("%c", ES_RandomNum[appendData]);
 		appendData++;
 	}//endFOR
 	
