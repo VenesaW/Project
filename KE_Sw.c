@@ -44,7 +44,7 @@
 //Packet lengths (total)
 #define KEY_EST_MSG2_LEN 98 //Length of KEY EST MSG 3 packet
 #define KEY_EST_MSG4_LEN 74 //Length of KEY EST MSG 5 packet
-#define KEY_EST_MSG67_LEN 18 //Length of KEY EST MSG 5 packet
+#define KEY_EST_MSG5_LEN 18 //Length of KEY EST MSG 5 packet
 #define NONCE_LEN 8 //8 Byte random number (Nonce) for key establishment
 #define RANDOM_NUM_LEN 8 //8 Byte random number (Nonce) for key establishment
 #define KEYING_MAT_LEN 16 //16 Byte keying material for key establishment
@@ -54,7 +54,7 @@
 #define CHALLENGE_LEN 16 //Length of challenge for key establishment
 #define IDENTIFIER_LEN 8 //Length of identifier for key establishment
 #define MSG2_ENC_LEN 48 //Length of encrypted payload for message 2
-#define MSG3_CONCAT_LEN 32 //Length of concatenated payload for message 3
+#define MSG2_CONCAT_LEN 32 //Length of concatenated payload for message 3
 #define MSG3_ENC_LEN 48 //Length of encrypted payload for message 3
 #define OFFSET 0 //Offset of payload in packet
 
@@ -987,7 +987,7 @@ void KE_failureMsg()
 	}//endFOR
 	for (getData = 0; getData < CHALLENGE_LEN; getData++)
 	{
-		msg7_packet[appendData] = challenge[getData];
+		msg7_packet[appendData] = Sw_challenge[getData];
 		appendData++;
 	}//endFOR
 	
@@ -1073,7 +1073,7 @@ void KE_successMsg()
 	}//endFOR
 	for (getData = 0; getData < CHALLENGE_LEN; getData++)
 	{
-		msg6_packet[appendData] = challenge[getData];
+		msg6_packet[appendData] = Sw_challenge[getData];
 		appendData++;
 	}//endFOR
 	
@@ -1322,7 +1322,7 @@ void handleKE_Msg3(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 
 	ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
 	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
-	udpMsg2 = (struct udpheaderMsg2*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
+	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
 
 	//Retrieve message 3 payload encrypted packet
@@ -1533,7 +1533,7 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 
 	ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
 	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
-	udpMsg2 = (struct udpheaderMsg2*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
+	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
 
 	//Retrieve message 2 payload encrypted packet
