@@ -202,6 +202,10 @@ int num_interfaces;//Interface 0 or 7 for *my* Windows PC
 pcap_if_t *all_Interfaces;//All available interfaces
 pcap_if_t *select_Interface;//Gets specific interface from list (Windows)
 pcap_t* outChannel;//Channel for packet capture
+pcap_t* Channel201;//Channel for packet capture on port 4
+pcap_t* Channel202;//Channel for packet capture on port 1
+pcap_t* Channel203;//Channel for packet capture on port 0
+pcap_t* Channel204;//Channel for packet capture on port 2
 struct bpf_program compiledCode;//Stores compiled program for filtering the incoming traffic
 
 //For packets
@@ -1098,12 +1102,12 @@ void handleKE_Msg5(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	//Retrieve message 5 payload challenge response
 	for (getData = OFFSET; getData < KEY_EST_MSG5_LEN; getData++)
 	{
-		ES_challengeResponse[getData] = switch_payload[getData];
+		ES_challengeResponse[getData] = ES_payload[getData];
 	}//endFOR
 	
 	//decrypt message
 	//Call decryption program
-	AES_init_ctx_iv(&ctx, ESMaster_Key, iv);
+	AES_init_ctx_iv(&ctx, SwMaster_Key, iv);
 	AES_CBC_decrypt_buffer(&ctx, ES_challengeResponse, AES_BLOCK);
 	
 		//Compare Sw(C) and ES(C)
@@ -1192,7 +1196,7 @@ void KE_fourthMessage()
 
 	chaskeyMsgLen = 16;
 	//Generate challenge response
-	chaskey(hash, Sw_challenge, ESSession_Key, chaskeySubkey1, chaskeySubkey2);
+	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
 	memcpy(Sw_challengeHash, hash, HASH_LEN);
 
 	//Encrypt concatenation
@@ -1233,7 +1237,7 @@ void sessionKeys()
 	appendData = 0;
 	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
 	{
-		s[appendData] = switch_keyMat[getData];
+		s[appendData] = Sw_keyMat[getData];
 		appendData++;
 	}
 	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
@@ -1288,7 +1292,7 @@ void sessionKeys()
 		chaskeyMsgLen = sizeof(h);
 		
 		//call Chaskey
-		chaskey(hash, h, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+		chaskey(hash, h, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
 		
 		//create z
 		for (appendData = 0; appendData < HASH_LEN; appendData++)
@@ -1338,7 +1342,7 @@ void handleKE_Msg3(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	{
 		//decrypt message
 		//Call decryption program
-	AES_init_ctx_iv(&ctx, ESMaster_Key, iv);
+	AES_init_ctx_iv(&ctx, SwMaster_Key, iv);
 	AES_CBC_decrypt_buffer(&ctx, incoming_payload, AES_BLOCK);
 	}
 	else {
@@ -1503,7 +1507,7 @@ void KE_secondMessage()
 	appendData = 90;
 	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 	{
-		msg2_packet[appendData] = switch_RandomNum[getData];
+		msg2_packet[appendData] = Sw_RandomNum[getData];
 		appendData++;
 	}//end_FOR
 
