@@ -872,6 +872,7 @@ void main()
 	unsigned char salt[20] = "445FF2333EEDAAA75BCC";
 	unsigned char u[20] = "667788997E34FAC236E4";//auxilary value
 	unsigned char h[80];
+	unsigned char w[80];
 	unsigned char z[] = " ";//bit string output of Chaskey from which to take key
 
 
@@ -888,6 +889,12 @@ void main()
 	memcpy(h + 32, p, 8);
 	memcpy(h + 40, salt, 20);
 	memcpy(h + 60, u, 20);
+
+	memcpy(w, p, 8);
+	memcpy(w + 8, s, 32);
+	memcpy(w + 40, u, 20);
+	memcpy(w + 60, salt, 20);
+
 	chaskeyMsgLen = 80;
 
 	printf("\nSession Key:\n");
@@ -896,38 +903,12 @@ void main()
 		if (c == 1)
 		{
 			chaskey(hash, h, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
-			memcpy(z, hash, hashLen);
-			/*
-			printf("\nHash 1:\n");
-			for (getData = 0; getData < 8; getData++)
-			{
-				printf("%02x", z[getData]);
-			}*/
 		}
 		if (c >= 2)
 		{
-			zLEN = zLEN + 8;
-			chaskey(hash, h, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
-			memcpy(z + zLEN, hash, hashLen);
-			/*printf("\nHash 2:\n");
-			for (getData = 0; getData < 16; getData++)
-			{
-				printf("%02x", z[getData]);
-			}*/
-
+			chaskey(hash, w, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
 		}
 	}//FOR
 
-	memcpy(b, z, 16);
-
-	/*
-	printf("\nSession Key:\n");
-	for (getData = 0; getData < 16; getData++)
-	{
-		printf("%02x", b[getData]);
-	}
-	printf("\n\n");
-	printf("\n\n");
-	*/
-
+	printf("\n");
 }//end_MAIN
