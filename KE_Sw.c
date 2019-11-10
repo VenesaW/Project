@@ -33,7 +33,7 @@
 #define INTERFACE_MODE 1 //Put interface in promiscuous mode (1) or non-promiscuous mode (0)
 #define PCAP_NETMASK_UNKNOWN 0xffffffff//default netmask
 #define READ_TIMEOUT 1000 //The packet buffer timeout in milliseconds ->0 means no timeout (slows down the code execution)
-#define TAG_LEN 8 //1 Byte (8 characters)
+#define TAG_LEN 1 //1 Byte
 #define SIZE_ETHERNET 14 //Ethernet headers are always exactly 14 bytes
 #define SIZE_IP 20 //IP headers are always 20 bytes
 #define SIZE_UDP 8 //UDP header length are 8 bytes
@@ -43,10 +43,10 @@
 #define NEXT_INCOMING 1 
 
 //Packet lengths (total)
-#define KEY_EST_MSG2_LEN 98 //Length of KEY EST MSG 3 packet
-#define KEY_EST_MSG4_LEN 74 //Length of KEY EST MSG 4 packet
-#define KEY_EST_MSG5_LEN 74 //Length of KEY EST MSG 5 packet
-#define KEY_EST_MSG67_LEN 18 //Length of KEY EST MSG 5 packet
+#define KEY_EST_MSG2_LEN 107 //Length of KEY EST MSG 2 packet
+#define KEY_EST_MSG4_LEN 75 //Length of KEY EST MSG 4 packet
+#define KEY_EST_MSG5_LEN 75 //Length of KEY EST MSG 5 packet
+#define KEY_EST_MSG67_LEN 59 //Length of KEY EST MSG 5 packet
 #define NONCE_LEN 16 //16 Byte random number (Nonce) for key establishment
 #define RANDOM_NUM_LEN 16 // 16 Byte random number (Nonce) for key establishment
 #define KEYING_MAT_LEN 16 //16 Byte keying material for key establishment
@@ -55,10 +55,13 @@
 #define ANSWER_LEN 2 //Length of success/failure answer for jey establishment
 #define CHALLENGE_LEN 16 //Length of challenge for key establishment
 #define IDENTIFIER_LEN 8 //Length of identifier for key establishment
-#define MSG1_PAYLOAD_LEN 24 //TAG_LEN + RANDOM_NUM_LEN
-#define MSG2_ENC_LEN 48 //Length of encrypted payload for message 2
-#define MSG2_CONCAT_LEN 32 //Length of concatenated payload for message 3
+#define MSG1_PAYLOAD_LEN  17//TAG_LEN + RANDOM_NUM_LEN
+#define MSG3_PAYLOAD_LEN  49//TAG_LEN + ENCRYPTED PORTION
+#define MSG5_PAYLOAD_LEN  33//TAG_LEN + ENCRYPTED PORTION
+#define MSG2_ENC_LEN 64 //Length of encrypted payload for message 2
+#define MSG2_CONCAT_LEN 54 //Length of concatenated payload for message 2
 #define MSG3_ENC_LEN 48 //Length of encrypted payload for message 3
+#define MSG3_CONCAT_LEN 38 //Length of concatenated payload for message 2
 #define OFFSET 0 //Offset of payload in packet
 
 //Keying and hashing material lengths
@@ -218,12 +221,12 @@ unsigned char msg4_packet[KEY_EST_MSG4_LEN];//Array to hold key establishment me
 unsigned char msg2_concat[MSG2_CONCAT_LEN];//Array to hold concatenated key establishment message 2
 unsigned char msg6_packet[KEY_EST_MSG67_LEN];//Array to hold key establishment message 6 packet
 unsigned char msg7_packet[KEY_EST_MSG67_LEN];//Array to hold key establishment message 7 packet
-unsigned char msg1_TAG[TAG_LEN] = "00000001";//TAG for Key Establishment message 1
-unsigned char msg2_TAG[TAG_LEN] = "00000010";//TAG for Key Establishment message 2 
-unsigned char msg3_TAG[TAG_LEN] = "00000011";//TAG for Key Establishment message 3
-unsigned char msg4_TAG[TAG_LEN] = "00000100";//TAG for Key Establishment message 4
-unsigned char msg5_TAG[TAG_LEN] = "00000101";//TAG for Key Establishment message 5
-unsigned char msg6_TAG[TAG_LEN] = "00000110";//TAG for Key Establishment message 6
+unsigned char msg1_TAG[TAG_LEN] = "1";//TAG for Key Establishment message 1
+unsigned char msg2_TAG[TAG_LEN] = "2";//TAG for Key Establishment message 2 
+unsigned char msg3_TAG[TAG_LEN] = "3";//TAG for Key Establishment message 3
+unsigned char msg4_TAG[TAG_LEN] = "4";//TAG for Key Establishment message 4
+unsigned char msg5_TAG[TAG_LEN] = "5";//TAG for Key Establishment message 5
+unsigned char msg6_TAG[TAG_LEN] = "6";//TAG for Key Establishment message 6
 ///key establishment packet parameters (outgoing)
 unsigned char Sw_RandomNum[RANDOM_NUM_LEN] = "804724F27A8CB534";//16 Byte Random number for Key Establishment message 1
 unsigned char Sw_ESID[IDENTIFIER_LEN] = "FEDCBAED";//Identifier for Key Establishment message 3
@@ -1416,12 +1419,12 @@ void KE_secondMessage()
     msg2_packet[4] = (0x4c);//L
     msg2_packet[5] = (0x31);//1
         //src_MAC (Switch)
-    msg2_packet[6] = (0x45);
-    msg2_packet[7] = (0x53);
-    msg2_packet[8] = (0x31);
-    msg2_packet[9] = (0x56);
-    msg2_packet[10] = (0x4c);
-    msg2_packet[11] = (0x31);//PC
+    msg2_packet[6] = (0x45);//E
+    msg2_packet[7] = (0x53);//S
+    msg2_packet[8] = (0x31);//1
+    msg2_packet[9] = (0x56);//V
+    msg2_packet[10] = (0x4c);//L
+    msg2_packet[11] = (0x31);//1
         //ether_type
     msg2_packet[12] = (0x08);
     msg2_packet[13] = (0x00);
@@ -1467,30 +1470,31 @@ void KE_secondMessage()
     //udp_checksum
     msg2_packet[40] = (0xaa);
     msg2_packet[41] = (0xff);//random
+	
 
-	//Re-insert and concatenate parameters for key establishment
-	///(1) R(Sw) --> Switch Random Number
+	//Concatenate parmeters for key establishment
+	///(1) R(Sw) --> Switch Random Number (16 bytes)
 	appendData = 0;
 	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 	{
 		msg2_concat[appendData] = Sw_RandomNum[getData];
 		appendData++;
 	}//endFOR
-	///(2) I(ES) --> ES Identifier
+	///(2) I(ES) --> ES Identifier (8 bytes)
 	appendData = 8;
 	for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 	{
 		msg2_concat[appendData] = Sw_ESID[getData];
 		appendData++;
 	}//endFOR
-	///(3) F(Sw) --> Switch Keying Material
+	///(3) F(Sw) --> Switch Keying Material (16 bytes)
 	appendData = 16;
 	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
 	{
 		msg2_concat[appendData] = Sw_keyMat[getData];
 		appendData++;
 	}//endFOR
-	///(4) Nonce(Sw) --> Switch Nonce
+	///(4) Nonce(Sw) --> Switch Nonce (16 bytes)
 	appendData = 24;
 	for (getData = 0; getData < NONCE_LEN; getData++)
 	{
@@ -1503,8 +1507,11 @@ void KE_secondMessage()
 	///Call encryption function
 	AES_CBC_encrypt_buffer(&ctx, msg2_concat, AES_BLOCK);
 
-	///Append encrypted payload on to packet
+	//append TAG (1 bytes)
 	appendData = 42;
+	msg2_packet[appendData] = msg2_TAG[0];
+	
+	appendData = 43;
 	//Append encrypted payload to packet
 	for (getData = 0; getData < MSG2_ENC_LEN; getData++)
 	{
@@ -1512,8 +1519,7 @@ void KE_secondMessage()
 		appendData++;
 	}//end_FOR
 	
-	///Append integrity value on to packet
-	appendData = 90;
+	//Append integrity value on to packet
 	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 	{
 		msg2_packet[appendData] = ES_RandomNum[getData];
@@ -1557,9 +1563,9 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	
 	//Retrieve message 1 random number
 	appendData = 0;
-	for (getData = OFFSET; getData < MSG1_PAYLOAD_LEN; getData++)
+	for (getData = 1; getData < MSG1_PAYLOAD_LEN; getData++)
 	{
-		ES_RandomNum[appendData] = ES_payload[getData+8];//Fill payload array for decryption
+		ES_RandomNum[appendData] = ES_payload[getData];//Fill payload array for decryption
 		appendData++;
 	}//endFOR
 	
