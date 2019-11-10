@@ -43,6 +43,7 @@
 
 //Packet lengths (total)
 #define KEY_EST_MSG2_LEN 98 //Length of KEY EST MSG 3 packet
+#define KEY_EST_MSG4_LEN 74 //Length of KEY EST MSG 4 packet
 #define KEY_EST_MSG5_LEN 74 //Length of KEY EST MSG 5 packet
 #define KEY_EST_MSG67_LEN 18 //Length of KEY EST MSG 5 packet
 #define NONCE_LEN 8 //8 Byte random number (Nonce) for key establishment
