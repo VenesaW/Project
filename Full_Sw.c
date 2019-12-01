@@ -1759,7 +1759,7 @@ void KE_secondMessage()
 	printf("\nConcat\n");
 	for (getData = 0; getData < 57; getData++)
 	{
-		printf("%02x", msg2_concat[getData]);
+		printf("%c", msg2_concat[getData]);
 	}
 	printf("\n");
 
