@@ -1792,9 +1792,9 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
 	
-	//printf("\n---------------------------------------------------------------------\n");
-    //printf("Grabbed packet of length %d\n", header->len);
-	//printf("\n---------------------------------------------------------------------\n");
+	printf("\n---------------------------------------------------------------------\n");
+    printf("Grabbed packet of length %d\n", header->len);
+	printf("\n---------------------------------------------------------------------\n");
 
 	//Retrieve message 1 payload
 	for (getData = OFFSET; getData < MSG1_PAYLOAD_LEN; getData++)
