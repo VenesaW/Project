@@ -1755,6 +1755,12 @@ void KE_secondMessage()
 		msg2_concat[appendData] = Sw_Nonce[getData];
 		appendData++;
 	}//endFOR
+	
+	for (getData = 0; getData < 57; getData++)
+	{
+		printf("%02x", msg2_concat[getData]);
+	}
+	printf("\n");
 
 	//Encrypt concatenation
 	AES_init_ctx_iv(&ctx, SwMaster_Key, iv);
