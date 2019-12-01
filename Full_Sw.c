@@ -1735,21 +1735,21 @@ void KE_secondMessage()
 		appendData++;
 	}//endFOR
 	///(2) I(ES) --> ES Identifier (8 bytes)
-	appendData = 8;
+	appendData = 16;
 	for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 	{
 		msg2_concat[appendData] = Sw_ESID[getData];
 		appendData++;
 	}//endFOR
 	///(3) F(Sw) --> Switch Keying Material (16 bytes)
-	appendData = 16;
+	appendData = 24;
 	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
 	{
 		msg2_concat[appendData] = Sw_keyMat[getData];
 		appendData++;
 	}//endFOR
 	///(4) Nonce(Sw) --> Switch Nonce (16 bytes)
-	appendData = 24;
+	appendData = 40;
 	for (getData = 0; getData < NONCE_LEN; getData++)
 	{
 		msg2_concat[appendData] = Sw_Nonce[getData];
