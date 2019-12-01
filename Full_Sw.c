@@ -46,7 +46,7 @@
 #define NEXT_INCOMING 1 
 
 //Packet lengths (total)
-#define KEY_EST_MSG2_LEN 107 //Length of KEY EST MSG 2 packet
+#define KEY_EST_MSG2_LEN 123 //Length of KEY EST MSG 2 packet
 #define KEY_EST_MSG4_LEN 75 //Length of KEY EST MSG 4 packet
 #define KEY_EST_MSG5_LEN 75 //Length of KEY EST MSG 5 packet
 #define KEY_EST_MSG67_LEN 59 //Length of KEY EST MSG 5 packet
