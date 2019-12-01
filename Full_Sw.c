@@ -46,7 +46,7 @@
 #define NEXT_INCOMING 1 
 
 //Packet lengths (total)
-#define KEY_EST_MSG2_LEN 122 //Length of KEY EST MSG 2 packet
+#define KEY_EST_MSG2_LEN 123 //Length of KEY EST MSG 2 packet
 #define KEY_EST_MSG4_LEN 75 //Length of KEY EST MSG 4 packet
 #define KEY_EST_MSG5_LEN 75 //Length of KEY EST MSG 5 packet
 #define KEY_EST_MSG67_LEN 59 //Length of KEY EST MSG 5 packet
@@ -1585,7 +1585,7 @@ void handleKE_Msg3(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	}//endFOR
 	//Retrieve message 3 payload integrity value
 	appendData = 0;
-	for (getData = 49; getData < RANDOM_NUM_LEN; getData++)
+	for (getData = 48; getData < RANDOM_NUM_LEN; getData++)
 	{
 		integrity_payload[appendData] = ES_payload[getData];//Fill payload array for decryption
 		appendData++;
@@ -1601,8 +1601,8 @@ void handleKE_Msg3(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	}
 	else {
 		//otherwise --> close channel
-		printf("ERORR!\n");
-		//kdf_failure++;//Increment error count
+		printf("Random number mismatch error\n");
+		kdf_failure++;//Increment error count
 		pcap_close(outChannel);//Close channel OR //start over??*********************************************************************************************************************************
 	}//end_IF_ELSE
 		
