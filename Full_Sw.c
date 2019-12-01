@@ -240,7 +240,7 @@ unsigned char msg6_TAG[TAG_LEN] = "6";//TAG for Key Establishment message 6
 unsigned char Sw_RandomNum[RANDOM_NUM_LEN] = "804724F27A8CB534";//16 Byte Random number for Key Establishment message 1
 unsigned char Sw_ESID[IDENTIFIER_LEN] = "FEDCBAED";//Identifier for Key Establishment message 3
 unsigned char Sw_SWID[IDENTIFIER_LEN] = "DCBFEAED";//Identifier for comparison in Key Establishment message 2
-unsigned char Sw_keyMat[KEYING_MAT_LEN] = "2774063BADC66030";//Keying material for Key Establishment message 3
+unsigned char Sw_keyMat[KEYING_MAT_LEN] = "2774063BADC66035";//Keying material for Key Establishment message 3
 unsigned char Sw_Nonce[NONCE_LEN] = "6035F92A5BDD673";//Nonce for Key Establishment message 3
 unsigned char Sw_challenge[] = "FFEEDDAAFFEEDDAA";//Challenge response for Key Establishment message 5
 unsigned char Sw_challengeHash[HASH_LEN];//Challenge response for Key Establishment message 5
