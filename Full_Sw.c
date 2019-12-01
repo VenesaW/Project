@@ -1649,6 +1649,16 @@ void handleKE_Msg3(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 //---------------------------------------------------------------------------------------
 void KE_secondMessage()
 {
+	printf("\n");
+	
+	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
+	{
+		printf("%c", ES_RandomNum[getData]);
+		appendData++;
+	}//endFOR
+	
+	printf("\n");
+	
 	struct AES_ctx ctx;//Initialize struct
     
      //Build packet for message 2 and encrypt the payload
@@ -1813,14 +1823,6 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	{
 		ES_RandomNum[appendData] = ES_payload[getData];//Fill payload array for decryption
 		printf("%c", ES_RandomNum[appendData]);
-		appendData++;
-	}//endFOR
-	
-	printf("\n");
-	
-	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
-	{
-		printf("%c", ES_RandomNum[getData]);
 		appendData++;
 	}//endFOR
 	
