@@ -1649,6 +1649,8 @@ void handleKE_Msg3(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 //---------------------------------------------------------------------------------------
 void KE_secondMessage()
 {
+	struct AES_ctx ctx;//Initialize struct
+	
 	printf("\n");
 	
 	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
@@ -1658,8 +1660,6 @@ void KE_secondMessage()
 	}//endFOR
 	
 	printf("\n");
-	
-	struct AES_ctx ctx;//Initialize struct
     
      //Build packet for message 2 and encrypt the payload
         //dst_MAC (ES4, VL1)
@@ -1721,6 +1721,16 @@ void KE_secondMessage()
     //udp_checksum
     msg2_packet[40] = (0xaa);
     msg2_packet[41] = (0xff);//random
+	
+	printf("\n");
+	
+	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
+	{
+		printf("%c", ES_RandomNum[getData]);
+		appendData++;
+	}//endFOR
+	
+	printf("\n");
 	
 
 	//Concatenate parmeters for key establishment
