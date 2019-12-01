@@ -1756,6 +1756,7 @@ void KE_secondMessage()
 		appendData++;
 	}//endFOR
 	
+	printf("\nConcat\n");
 	for (getData = 0; getData < 57; getData++)
 	{
 		printf("%02x", msg2_concat[getData]);
