@@ -1073,11 +1073,11 @@ void regularUsage()
 	packet[32] = (0xb2);
 	packet[33] = (0x5c);//PC//92
 		//src_port
-	packet[34] = (0x07);
-	packet[35] = (0xd0);
+	packet[34] = (0x04);
+	packet[35] = (0x15);
 		//dst_port
 	packet[36] = (0x04);
-	packet[37] = (0x15);
+	packet[37] = (0x16);
 		//udp_length
 	packet[38] = (0x01);
 	packet[39] = (0x07);
@@ -1220,11 +1220,11 @@ void KE_failureMsg()
     msg7_packet[32] = (0xb2);
     msg7_packet[33] = (0x5a);//random
         //src_port
-    msg7_packet[34] = (0x07);
-    msg7_packet[35] = (0xd0);//random
+    msg7_packet[34] = (0x04);
+    msg7_packet[35] = (0x15);//random
     //dst_port
     msg7_packet[36] = (0x04);
-    msg7_packet[37] = (0x15);//random
+    msg7_packet[37] = (0x16);//random
     //udp_length
     msg7_packet[38] = (0x00);
     msg7_packet[39] = (0x12);//18 bytes
@@ -1306,11 +1306,11 @@ void KE_successMsg()
     msg6_packet[32] = (0xb2);
     msg6_packet[33] = (0x5a);//random
         //src_port
-    msg6_packet[34] = (0x07);
-    msg6_packet[35] = (0xd0);//random
+    msg6_packet[34] = (0x04);
+    msg6_packet[35] = (0x15);//random
     //dst_port
     msg6_packet[36] = (0x04);
-    msg6_packet[37] = (0x15);//random
+    msg6_packet[37] = (0x16);//random
     //udp_length
     msg6_packet[38] = (0x00);
     msg6_packet[39] = (0x12);//18 bytes
@@ -1436,11 +1436,11 @@ void KE_fourthMessage()
     msg4_packet[32] = (0xb2);
     msg4_packet[33] = (0x5a);//random
         //src_port
-    msg4_packet[34] = (0x07);
-    msg4_packet[35] = (0xd0);//random
+    msg4_packet[34] = (0x04);
+    msg4_packet[35] = (0x15);//random
     //dst_port
     msg4_packet[36] = (0x04);
-    msg4_packet[37] = (0x15);//random
+    msg4_packet[37] = (0x16);//random
     //udp_length
     msg4_packet[38] = (0x00);
     msg4_packet[39] = (0x12);//18 bytes
@@ -1714,15 +1714,15 @@ void KE_secondMessage()
     msg2_packet[32] = (0xb2);
     msg2_packet[33] = (0x5a);//random
         //src_port
-    msg2_packet[34] = (0x07);
-    msg2_packet[35] = (0xd0);//random
-    //dst_port
+    msg2_packet[34] = (0x04);
+    msg2_packet[35] = (0x15);//random
+		//dst_port
     msg2_packet[36] = (0x04);
-    msg2_packet[37] = (0x15);//random
-    //udp_length
+    msg2_packet[37] = (0x16);//random
+		//udp_length
     msg2_packet[38] = (0x00);
     msg2_packet[39] = (0x12);//18 bytes
-    //udp_checksum
+		//udp_checksum
     msg2_packet[40] = (0xaa);
     msg2_packet[41] = (0xff);//random
 
