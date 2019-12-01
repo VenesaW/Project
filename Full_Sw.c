@@ -1767,7 +1767,7 @@ void KE_secondMessage()
 	{
 		msg2_packet[appendData] = (unsigned char)ES_RandomNum[getData];
 		//msg2_packet[appendData] = ES_RandomNum[getData];
-		printf("%c", msg2_packet[appendData]);
+		printf(msg2_packet[appendData]);
 		appendData++;
 	}//end_FOR
 
