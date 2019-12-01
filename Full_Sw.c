@@ -1770,6 +1770,12 @@ void KE_secondMessage()
 		appendData++;
 	}//end_FOR
 	
+	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
+	{
+		printf("%c", ES_RandomNum[getData]);
+		appendData++;
+	}//endFOR
+	
 	printf("\n");
 	
 	//Append integrity value on to packet
@@ -1780,6 +1786,16 @@ void KE_secondMessage()
 		//printf("%c", ES_RandomNum[getData]);
 		appendData++;
 	}//end_FOR
+	
+	printf("\n");
+	
+	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
+	{
+		printf("%c", ES_RandomNum[getData]);
+		appendData++;
+	}//endFOR
+	
+	printf("\n");
 
 	//send packet
 	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//KDF message 1 packet
