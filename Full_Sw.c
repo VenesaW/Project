@@ -1763,7 +1763,9 @@ void KE_secondMessage()
 	//Append integrity value on to packet
 	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 	{
-		msg2_packet[appendData] = (unsigned char)ES_RandomNum[getData];
+		//msg2_packet[appendData] = (unsigned char)ES_RandomNum[getData];
+		msg2_packet[appendData] = ES_RandomNum[getData];
+		printf("%c", ES_RandomNum[getData]);
 		appendData++;
 	}//end_FOR
 
@@ -1795,7 +1797,8 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	printf("\n---------------------------------------------------------------------\n");
     printf("Grabbed packet of length %d\n", header->len);
 	printf("\n---------------------------------------------------------------------\n");
-
+	printf("\n");
+	
 	//Retrieve message 1 payload
 	for (getData = OFFSET; getData < MSG1_PAYLOAD_LEN; getData++)
 	{
