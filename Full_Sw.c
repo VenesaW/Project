@@ -1760,6 +1760,20 @@ void KE_secondMessage()
 	AES_init_ctx_iv(&ctx, SwMaster_Key, iv);
 	///Call encryption function
 	AES_CBC_encrypt_buffer(&ctx, msg2_concat, AES_BLOCK);
+	memcpy(encrypted_payload, msg2_concat, 64);
+	AES_CBC_decrypt_buffer(&ctx, encrypted_payload, AES_BLOCK);
+
+	printf("\nencrypted:\n");
+	for (getData = 0; getData < 64; getData++)
+	{
+		printf("%c", msg2_concat[getData]);
+	}//endFOR
+	
+	printf("\ndecrypted:\n");
+	for (getData = 0; getData < 64; getData++)
+	{
+		printf("%c", encrypted_payload[getData]);
+	}//endFOR
 
 	//append TAG (1 bytes)
 	appendData = 42;
