@@ -1760,6 +1760,8 @@ void KE_secondMessage()
 		appendData++;
 	}//end_FOR
 	
+	printf("\n");
+	
 	//Append integrity value on to packet
 	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 	{
