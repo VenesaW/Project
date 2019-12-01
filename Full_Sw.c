@@ -1558,7 +1558,7 @@ void sessionKeys()
 		{
 			b[appendData] = z[appendData];
 		}//endFOR	
-}//endSESSION_KEYS
+}//endSESSION_KEYS*/
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
@@ -1629,10 +1629,11 @@ void handleKE_Msg3(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 	//Compare I(ES) and I(ES)'
 	if ((0 == memcmp((char*)ES_swID, (char*)Sw_SWID, IDENTIFIER_LEN)))
 	{
+		printf("match\n");
 		//generate session keys
-		sessionKeys();
+		//sessionKeys();
 		//create and send message 4
-		KE_fourthMessage();
+		//KE_fourthMessage();
 	}
 	else {
 		//otherwise --> close channel
@@ -1640,7 +1641,7 @@ void handleKE_Msg3(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 		//kdf_failure++;//Increment error count
 		pcap_close(Channel204);//Close channel OR //start over??*********************************************************************************************************************************
 	}//end_IF_ELSE	
-}//end_HANDLE_KE_MSG_3*/
+}//end_HANDLE_KE_MSG_3
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
@@ -1771,13 +1772,11 @@ void KE_secondMessage()
 		appendData++;
 	}//end_FOR
 	
-	//printf("\n");
-
 	//send packet
 	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//KDF message 1 packet
 
 	//listen for KE message 2 from ES
-	//pcap_loop(Channel204, NEXT_INCOMING, handleKE_Msg3, NULL);//Start packet capture on port 2
+	pcap_loop(Channel204, NEXT_INCOMING, handleKE_Msg3, NULL);//Start packet capture on port 2
 }//end_KE_SECOND_MESSAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
