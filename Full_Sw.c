@@ -1762,11 +1762,6 @@ void KE_secondMessage()
 	
 	printf("\n");
 	
-	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
-	{
-		printf("%c", ES_RandomNum[getData]);
-	}//end_FOR
-	
 	//Append integrity value on to packet
 	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 	{
@@ -1820,6 +1815,16 @@ void handleKE_Msg1(u_char *Uselesspointr, const struct pcap_pkthdr *header, cons
 		printf("%c", ES_RandomNum[appendData]);
 		appendData++;
 	}//endFOR
+	
+	printf("\n");
+	
+	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
+	{
+		printf("%c", ES_RandomNum[getData]);
+		appendData++;
+	}//endFOR
+	
+	printf("\n");
 	
 	KE_secondMessage();
 
