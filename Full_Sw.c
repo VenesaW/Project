@@ -1770,6 +1770,12 @@ void KE_secondMessage()
 		printf("%c", ES_RandomNum[getData]);
 		appendData++;
 	}//end_FOR
+	
+	for (getData = 0; getData < sizeof(msg2_packet); getData++)
+	{
+		if ( (getData % 16) == 0) printf("\n");
+		printf("%c", msg2_packet[getData]);
+	}//end_FOR
 
 	//send packet
 	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//KDF message 1 packet
