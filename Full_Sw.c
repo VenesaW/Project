@@ -1756,13 +1756,6 @@ void KE_secondMessage()
 		appendData++;
 	}//endFOR
 	
-	printf("\nConcat\n");
-	for (getData = 0; getData < 57; getData++)
-	{
-		printf("%c", msg2_concat[getData]);
-	}
-	printf("\n");
-
 	//Encrypt concatenation
 	AES_init_ctx_iv(&ctx, SwMaster_Key, iv);
 	///Call encryption function
@@ -1772,12 +1765,14 @@ void KE_secondMessage()
 	appendData = 42;
 	msg2_packet[appendData] = msg2_TAG[0];
 	
+	printf("\n");
 	appendData = 43;
 	//Append encrypted payload to packet
 	for (getData = 0; getData < MSG2_ENC_LEN; getData++)
 	{
 		msg2_packet[appendData] = msg2_concat[getData];
 		appendData++;
+		printf("%c", msg2_concat[getData]);
 	}//end_FOR
 	
 	//send packet
