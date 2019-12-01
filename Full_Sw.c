@@ -1765,8 +1765,8 @@ void KE_secondMessage()
 	//Append integrity value on to packet
 	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 	{
-		//msg2_packet[appendData] = (unsigned char)ES_RandomNum[getData];
-		msg2_packet[appendData] = ES_RandomNum[getData];
+		msg2_packet[appendData] = (unsigned char)ES_RandomNum[getData];
+		//msg2_packet[appendData] = ES_RandomNum[getData];
 		printf("%c", ES_RandomNum[getData]);
 		appendData++;
 	}//end_FOR
