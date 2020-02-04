@@ -1010,7 +1010,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		msgFlag[getData] =  ES_payload[getData];//Fill payload array for decryption
 	}//endFOR
 	
-	switch (msgFlag)
+	switch (msgFlag[0])
 		{
         case 0x01:
 			printf("\nKey Establishment Message Type 1 recognized\n");
