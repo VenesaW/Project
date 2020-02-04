@@ -48,7 +48,7 @@
 
 //Packet lengths (total)
 #define KEY_EST_MSG1_LEN 59 //Length of KEY EST MSG 1 packet
-#define KEY_EST_MSG2_LEN 113 //Length of KEY EST MSG 2 packet
+#define KEY_EST_MSG2_LEN 115 //Length of KEY EST MSG 2 packet
 #define KEY_EST_MSG3_LEN 97 //Length of KEY EST MSG 3 packet
 #define KEY_EST_MSG4_LEN 59 //Length of KEY EST MSG 4 packet
 #define KEY_EST_MSG5_LEN 59 //Length of KEY EST MSG 5 packet
@@ -983,6 +983,121 @@ void openInterfaces()
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
+//                FIRST KE MESSAGE TO Switch
+				//1) The ES sends the Switch a random number R(ES) in message 1
+//---------------------------------------------------------------------------------------
+void KE_secondMessage()
+{    
+    //Build packet for message 2 and encrypt the payload
+        //dst_MAC (ES4, VL1)
+    msg2_packet[0] = (0x45);//E
+    msg2_packet[1] = (0x53);//S
+    msg2_packet[2] = (0x34);//4
+    msg2_packet[3] = (0x56);//V
+    msg2_packet[4] = (0x4c);//L
+    msg2_packet[5] = (0x31);//1
+        //src_MAC (Switch)
+    msg2_packet[6] = (0x45);//E
+    msg2_packet[7] = (0x53);//S
+    msg2_packet[8] = (0x31);//1
+    msg2_packet[9] = (0x56);//V
+    msg2_packet[10] = (0x4c);//L
+    msg2_packet[11] = (0x31);//1
+        //ether_type
+    msg2_packet[12] = (0x08);
+    msg2_packet[13] = (0x00);
+    //IPv4
+    msg2_packet[14] = (0x45);
+    msg2_packet[15] = (0x00);
+    //total_length
+    msg2_packet[16] = (0x00);
+    msg2_packet[17] = (0x1a);//26 bytes
+    //identification
+    msg2_packet[18] = (0x1d);
+    msg2_packet[19] = (0x94);//random
+    //flags
+    msg2_packet[20] = (0x00);
+    //fragment
+    msg2_packet[21] = (0x00);
+    //ttl
+    msg2_packet[22] = (0x01);
+    //protocol
+    msg2_packet[23] = (0x11);
+    //ip_checksum
+    msg2_packet[24] = (0x91);
+    msg2_packet[25] = (0x6e);//random
+    //src_ip
+    msg2_packet[26] = (0xc0);
+    msg2_packet[27] = (0xa8);
+    msg2_packet[28] = (0xb2);
+    msg2_packet[29] = (0x5c);//random
+        //dst_ip
+    msg2_packet[30] = (0xc0);
+    msg2_packet[31] = (0xa8);
+    msg2_packet[32] = (0xb2);
+    msg2_packet[33] = (0x5a);//random
+        //src_port
+    msg2_packet[34] = (0x04);
+    msg2_packet[35] = (0x15);//random
+		//dst_port
+    msg2_packet[36] = (0x04);
+    msg2_packet[37] = (0x16);//random
+		//udp_length
+    msg2_packet[38] = (0x00);
+    msg2_packet[39] = (0x12);//18 bytes
+		//udp_checksum
+    msg2_packet[40] = (0xaa);
+    msg2_packet[41] = (0xff);//random
+	
+	//Append flag
+	msg2_packet[42] = (0x02);//Key est msg 2 flag
+
+	//Append other parmeters for key establishment message 2
+	///(1) R(Sw) --> Switch Random Number (16 bytes)
+	appendData = 43;
+	for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
+	{
+		msg2_packet[appendData] = Sw_RandomNum[getData];
+		appendData++;
+	}//endFOR
+	///(2) I(ES) --> ES Identifier (8 bytes)
+	appendData = 59;
+	for (getData = 0; getData < IDENTIFIER_LEN; getData++)
+	{
+		msg2_packet[appendData] = Sw_ESID[getData];
+		appendData++;
+	}//endFOR
+	///(3) F(Sw) --> Switch Keying Material (16 bytes)
+	appendData = 67;
+	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
+	{
+		msg2_packet[appendData] = Sw_keyMat[getData];
+		appendData++;
+	}//endFOR
+	///(4) Nonce(Sw) --> Switch Nonce (16 bytes)
+	appendData = 83;
+	for (getData = 0; getData < NONCE_LEN; getData++)
+	{
+		msg2_packet[appendData] = Sw_Nonce[getData];
+		appendData++;
+	}//endFOR
+	///(5) Nonce(Sw) --> Switch Nonce (16 bytes)
+	appendData = 99;
+	for (getData = 0; getData < NONCE_LEN; getData++)
+	{
+		msg2_packet[appendData] = ES_RandomNum[getData];
+		appendData++;
+	}//endFOR
+	
+	//send packet
+	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//Key establishment message 2 packet
+
+	//listen for KE message 2 from ES
+	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+}//end_KE_SECOND_MESSAGE
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
 //                HANDLING KEY DERIVATION MESSAGE 2 FROM Switch
 					//1)Read message from switch
 					//2)ES sends E[masterkey](R[ES]||R[sw]||F[sw]||Text[2])
@@ -1024,7 +1139,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				appendData++;
 			}//endFOR
 			printf("\n");
-			//KE_secondMessage();//Create and send message 2
+			KE_secondMessage();//Create and send message 2
 		break;
 		
 		case 0x02:
@@ -1045,10 +1160,19 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		case 0x07:
 		break;
 		
+		case 0x08:
+		break;
+		
 		case 0x09:
 		break;
 		
 		case 0x10:
+		break;
+		
+		case 0x11:
+		break;
+		
+		case 0x12:
 		break;
 		
 		default: printf("\nUnrecognized message\n");
