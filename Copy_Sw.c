@@ -1012,7 +1012,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 	
 	switch (msgFlag)
 		{
-        case "01":
+        case 1:
 			printf("\nKey Establishment Message Type 1 recognized\n");
 			//Retrieve message 1 random number
 			printf("\nRandom Number:\n");
@@ -1027,31 +1027,31 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			//KE_secondMessage();//Create and send message 2
 		break;
 		
-		case "02":
+		case 2:
 		break;
 		
-		case "03":
+		case 3:
 		break;
 		
-		case "04":
+		case 4:
 		break;
 		
-		case "05":
+		case 5:
 		break;
 		
-		case "06":
+		case 6:
 		break;
 		
-		case "07":
+		case 7:
 		break;
 		
-		case "08":
+		case 9:
 		break;
 		
-		case "09":
+		case 10:
 		break;
 		
-		case "10":
+		case 10:
 		break;
 		
 		default: printf("\nUnrecognized message\n");
