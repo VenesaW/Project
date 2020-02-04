@@ -983,8 +983,93 @@ void openInterfaces()
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
-//                FIRST KE MESSAGE TO Switch
-				//1) The ES sends the Switch a random number R(ES) in message 1
+//                HANDLING KEY DERIVATION MESSAGE 2 FROM Switch
+					//1)Read message from switch
+					//2)ES sends E[masterkey](R[ES]||R[sw]||F[sw]||Text[2])
+					//3)Initiate key derivation function
+//---------------------------------------------------------------------------------------
+void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_char *in_packet)
+{
+	struct ethernetHeader *ethdr = NULL;//Initialize struct
+	struct ipheader *v4hdr = NULL;//Initialize struct
+	struct udpheader *udpMsg2 = NULL;//Initialize struct
+
+	ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
+	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
+	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
+	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
+	
+	printf("\n---------------------------------------------------------------------\n");
+    printf("Grabbed packet of length %d\n", header->len);
+	printf("\n---------------------------------------------------------------------\n");
+	printf("\n");
+	
+	//Retrieve  flag and call appropriate function 
+	for (getData = OFFSET; getData < FLAG_LEN; getData++)
+	{
+		msgFlag[getData] =  ES_payload[getData];//Fill payload array for decryption
+	}//endFOR
+	
+	switch (msgFlag[0])
+		{
+        case 0x01:
+			printf("\nKey Establishment Message Type 1 recognized\n");
+			//Retrieve message 1 random number
+			printf("\nRandom Number:\n");
+			appendData = 0;
+			for (getData = 1; getData < MSG1_PAYLOAD_LEN + 1; getData++)
+			{
+				ES_RandomNum[appendData] = ES_payload[getData];//Fill payload array for decryption
+				printf("%c", ES_RandomNum[appendData]);
+				appendData++;
+			}//endFOR
+			printf("\n");
+			KE_secondMessage();//Create and send message 2
+		break;
+		
+		case 0x02:
+		break;
+		
+		case 0x03:
+		break;
+		
+		case 0x04:
+		break;
+		
+		case 0x05:
+		break;
+		
+		case 0x06:
+		break;
+		
+		case 0x07:
+		break;
+		
+		case 0x08:
+		break;
+		
+		case 0x09:
+		break;
+		
+		case 0x10:
+		break;
+		
+		case 0x11:
+		break;
+		
+		case 0x12:
+		break;
+		
+		default: printf("\nUnrecognized message\n");
+		break;
+		}//endSWITCH
+
+}//end_HANDLE_MSG
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
+//                FIRST KE MESSAGE FROM SWITCH TO ES
+					//1)Switch sends E[masterkey](R[Sw]||I[ES]||F[sw]||Nonce[SW])||R[ES]
 //---------------------------------------------------------------------------------------
 void KE_secondMessage()
 {    
@@ -1095,91 +1180,6 @@ void KE_secondMessage()
 	//listen for KE message 2 from ES
 	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 }//end_KE_SECOND_MESSAGE
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//---------------------------------------------------------------------------------------
-//                HANDLING KEY DERIVATION MESSAGE 2 FROM Switch
-					//1)Read message from switch
-					//2)ES sends E[masterkey](R[ES]||R[sw]||F[sw]||Text[2])
-					//3)Initiate key derivation function
-//---------------------------------------------------------------------------------------
-void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_char *in_packet)
-{
-	struct ethernetHeader *ethdr = NULL;//Initialize struct
-	struct ipheader *v4hdr = NULL;//Initialize struct
-	struct udpheader *udpMsg2 = NULL;//Initialize struct
-
-	ethdr = (struct ethernetHeader*)(in_packet);//Ethernet header offset
-	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
-	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
-	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
-	
-	printf("\n---------------------------------------------------------------------\n");
-    printf("Grabbed packet of length %d\n", header->len);
-	printf("\n---------------------------------------------------------------------\n");
-	printf("\n");
-	
-	//Retrieve  flag and call appropriate function 
-	for (getData = OFFSET; getData < FLAG_LEN; getData++)
-	{
-		msgFlag[getData] =  ES_payload[getData];//Fill payload array for decryption
-	}//endFOR
-	
-	switch (msgFlag[0])
-		{
-        case 0x01:
-			printf("\nKey Establishment Message Type 1 recognized\n");
-			//Retrieve message 1 random number
-			printf("\nRandom Number:\n");
-			appendData = 0;
-			for (getData = 1; getData < MSG1_PAYLOAD_LEN + 1; getData++)
-			{
-				ES_RandomNum[appendData] = ES_payload[getData];//Fill payload array for decryption
-				printf("%c", ES_RandomNum[appendData]);
-				appendData++;
-			}//endFOR
-			printf("\n");
-			KE_secondMessage();//Create and send message 2
-		break;
-		
-		case 0x02:
-		break;
-		
-		case 0x03:
-		break;
-		
-		case 0x04:
-		break;
-		
-		case 0x05:
-		break;
-		
-		case 0x06:
-		break;
-		
-		case 0x07:
-		break;
-		
-		case 0x08:
-		break;
-		
-		case 0x09:
-		break;
-		
-		case 0x10:
-		break;
-		
-		case 0x11:
-		break;
-		
-		case 0x12:
-		break;
-		
-		default: printf("\nUnrecognized message\n");
-		break;
-		}//endSWITCH
-
-}//end_HANDLE_MSG
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
