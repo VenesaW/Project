@@ -1053,6 +1053,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		default: printf("\nUnrecognized message\n");
 		break;
+		}//endSWITCH
 
 }//end_HANDLE_MSG
 //////////////////////////////////////////////////////////////////////////////////////////
