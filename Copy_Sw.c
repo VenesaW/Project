@@ -1007,10 +1007,10 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 	//Retrieve  flag and call appropriate function 
 	for (getData = OFFSET; getData < FLAG_LEN; getData++)
 	{
-		msgflag[getData] =  ES_payload[getData];//Fill payload array for decryption
+		msgFlag[getData] =  ES_payload[getData];//Fill payload array for decryption
 	}//endFOR
 	
-	switch (msgflag)
+	switch (msgFlag)
 		{
         case 1:
 			printf("\nKey Establishment Message Type 1 recognized\n");
