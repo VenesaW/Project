@@ -1097,7 +1097,7 @@ void KE_secondMessage()
 	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//KDF message 1 packet
 	
 	//sleep?
-	Sleep(0.1);
+	//sleep(0.1);
 	///Listen for incoming then loop back
 	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 }//end_KE_SECOND_MESSAGE
