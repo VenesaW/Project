@@ -1142,7 +1142,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				appendData++;
 			}//endFOR
 			printf("\n");
-			pcap_close(Channel204);
+			pcap_breakloop(Channel204);
 			KE_secondMessage();//Create and send message 2
 		break;
 		
