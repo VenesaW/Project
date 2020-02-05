@@ -1141,8 +1141,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			}//endFOR
 			printf("\n");
 			KE_secondMessage();//Create and send message 2
-			pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
-
 		break;
 		
 		case 0x02:
@@ -1182,7 +1180,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		default: printf("\nUnrecognized message\n");
 		break;
 		}//endSWITCH
-
+	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);
 }//end_HANDLE_MSG
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
