@@ -1096,8 +1096,8 @@ void KE_secondMessage()
 	//send packet
 	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//KDF message 1 packet
 
-	//listen for KE message 2 from ES
-	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+	//listen for KE message 3 from ES
+	//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 }//end_KE_SECOND_MESSAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
