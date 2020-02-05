@@ -1095,9 +1095,6 @@ void KE_secondMessage()
 			
 	//send packet
 	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//KDF message 1 packet
-	
-	///Listen for incoming then loop back
-	//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 }//end_KE_SECOND_MESSAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1144,6 +1141,8 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			}//endFOR
 			printf("\n");
 			KE_secondMessage();//Create and send message 2
+			pcap_loop(outChannel, NEXT_INCOMING, handleKEMsg, NULL);//Start packet capture on port 2
+
 		break;
 		
 		case 0x02:
