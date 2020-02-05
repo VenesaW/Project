@@ -26,6 +26,10 @@
 #include<netinet/ip.h>//For ip header declarations
 #include<netinet/in.h>//For constants and structures needed for internet domain addresses
 //---------------------------------------------------------------------------------------
+//                FUNCTIONS FORWARD DECLARATIONS
+//---------------------------------------------------------------------------------------
+void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_char *in_packet);
+//---------------------------------------------------------------------------------------
 //                STATIC DECLARATIONS
 //---------------------------------------------------------------------------------------
 //Ethernet structure properties
@@ -1088,6 +1092,12 @@ void KE_secondMessage()
 		msg2_packet[appendData] = ES_RandomNum[getData];
 		appendData++;
 	}//endFOR
+			
+	//send packet
+	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//KDF message 1 packet
+
+	//listen for KE message 2 from ES
+	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 }//end_KE_SECOND_MESSAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1134,13 +1144,13 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			}//endFOR
 			printf("\n");
 			KE_secondMessage();//Create and send message 2
-			pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 		break;
 		
 		case 0x02:
 		break;
 		
 		case 0x03:
+			printf("\nKey Establishment Message Type 3 recognized\n");
 		break;
 		
 		case 0x04:
