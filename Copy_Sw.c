@@ -1145,6 +1145,9 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				appendData++;
 			}//endFOR
 			printf("\n");
+			//Null
+			header = NULL;
+			in_packet = NULL;
 			KE_secondMessage();//Create and send message 2
 		break;
 		
