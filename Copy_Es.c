@@ -45,7 +45,7 @@ void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const 
 //Packet lengths (total)
 #define KEY_EST_MSG1_LEN 59 //Length of KEY EST MSG 1 packet
 #define KEY_EST_MSG2_LEN 115 //Length of KEY EST MSG 2 packet
-#define KEY_EST_MSG3_LEN 97 //Length of KEY EST MSG 3 packet
+#define KEY_EST_MSG3_LEN 107 //Length of KEY EST MSG 3 packet
 #define KEY_EST_MSG4_LEN 59 //Length of KEY EST MSG 4 packet
 #define KEY_EST_MSG5_LEN 59 //Length of KEY EST MSG 5 packet
 #define KEY_EST_MSG6_LEN 59 //Length of KEY EST MSG 6 packet
@@ -300,7 +300,7 @@ unsigned char *newDigest;//Pointer to recalculated message digest
 const char *hex_digits = "0123456789ABCDEF";//Used to generate payload
 
 ///Counters
-int counter = 0;
+int counter;
 int keyCheck = 0;
 int key_usage_threshold = 0;
 int key_change_over_threshold = 0;
@@ -999,6 +999,99 @@ void openInterfaces()
 }//endOPEN_INTERFACES
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
+//                SESSION KEY _ KDF
+//---------------------------------------------------------------------------------------
+void sessionKeys()
+{
+	/*
+		Set d = ceil(Lb / Lh)
+		If d >= (2Lc), then halt and output invalid
+		Set z = empty string
+		For c = 1 to d :
+			Set z = z || h(s || c || p || t || [u])
+			Set b = the leftmost L_b bits of z
+	*/
+	//concatenate the keying materials to create s
+	appendData = 0;
+	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
+	{
+		s[appendData] = switch_keyMat[getData];
+		appendData++;
+	}
+	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
+	{
+		s[appendData] = ES_keyMat[getData];
+		appendData++;
+	}
+
+
+	d = ceil(Lb / Lh);
+	//printf("\nd is: %f\n", d);
+
+	if (d >= (2 * Lc))
+	{
+		printf("\nINVALID\n");
+		exit(EXIT_FAILURE);
+	} //endIF
+
+	for (c = 1; c <= d; c++)
+	{
+		//concatenate input strings: s; p; salt; u;
+		appendData = 0;
+		///(1)s
+		for (getData = 0; getData < 32; getData++)
+		{
+			h[appendData] = s[getData];
+			appendData++;
+		}//endFOR
+		///(2)c
+		h[appendData] = c;
+		appendData++;
+
+		///(3)p
+		for (getData = 0; getData < 8; getData++)
+		{
+			h[appendData] = p[getData];
+			appendData++;
+		}//endFOR
+
+		///(4)t
+		for (getData = 0; getData < 20; getData++)
+		{
+			h[appendData] = salt[getData];
+			appendData++;
+		}//endFOR
+
+		///(5)u
+		for (getData = 0; getData < 20; getData++)
+		{
+			h[appendData] = u[getData];
+			appendData++;
+		}//endFOR
+
+		chaskeyMsgLen = sizeof(h);
+
+		//call Chaskey
+		chaskey(hash, h, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+
+		//create z
+		for (appendData = 0; appendData < HASH_LEN; appendData++)
+		{
+			z[appendData] = hash[appendData];
+		}//endFOR
+	}//endFOR
+
+	printf("\nSession Key:\n");
+	for (appendData = 0; appendData < 32; appendData++)
+	{
+		b[appendData] = z[appendData];
+		printf("%c", b[appendData]);
+	}//endFOR
+	printf("\n");
+}//endSESSION_KEYS
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 //------------------------------------------------------------------------------------------------
 //                THIRD KE MESSAGE TO Switch
 				//1) The ES sends the Switch E[masterkey](R[Sw]||I[ES]||F[Sw]||Nonce[Sw])||R[ES]
@@ -1103,10 +1196,6 @@ void KE_thirdMessage()
 
 	//send packet
 	pcap_sendpacket(outChannel, msg3_packet, KEY_EST_MSG3_LEN);//KDF message 3 packet
-
-	//listen for KE message 4 from ES
-	//pcap_loop(outChannel, NEXT_INCOMING, handleKE_Msg4, NULL);//Start packet capture on port 2
-
 }//END_KE_THIRD_MESSAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1249,38 +1338,48 @@ void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const 
 			for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 			{
 				switch_RandomNum[getData] = switch_payload[appendData];
+				printf("%c", switch_RandomNum[getData]);
 				appendData++;
-				printf("%02x", switch_RandomNum[getData]);
 			}
 			printf("\n");
+			printf("\nES Identifier:\n");
 			///(2) I(ES) --> ES identifier
 			for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 			{
 				switch_ESID[getData] = switch_payload[appendData];
+				printf("%c", switch_ESID[getData]);
 				appendData++;
-				printf("%02x", switch_ESID[getData]);
 			}
+			printf("\n");
+			printf("\nSwitch Keying Material:\n");
 			///(3) F(switch) --> Keying material
 			for (getData = 0; getData < KEYING_MAT_LEN; getData++)
 			{
 				switch_keyMat[getData] = switch_payload[appendData];
+				printf("%c", switch_keyMat[getData]);
 				appendData++;
 			}
+			printf("\n");
+			printf("\nSwitch Nonce:\n");
 			///(4) N(switch) --> Nonce
 			for (getData = 0; getData < NONCE_LEN; getData++)
 			{
 				switch_Nonce[getData] = switch_payload[appendData];
+				printf("%c", switch_Nonce[getData]);
 				appendData++;
 			}
+
+			printf("\n");
 
 			//Compare I(ES) and I(ES)'
 			if ((0 == memcmp((char*)switch_ESID, (char*)ES_ESID, IDENTIFIER_LEN)))
 			{
 				printf("\nNo errors...generating session key\n");
+				counter = 5;
 				//generate session keys
-				//sessionKeys();
+				sessionKeys();
 				//create and send message 3
-				//KE_thirdMessage();
+				KE_thirdMessage();
 			}
 			else {
 				//otherwise --> close channel
@@ -1293,8 +1392,6 @@ void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const 
 			printf("\nMismatch error\n");
 			exit(EXIT_FAILURE);
 		}//end_IF_ELSE
-
-		//KE_thirdMessage();//Create and send message 2
 		break;
 
 	case 0x03:
