@@ -333,6 +333,8 @@ int appendData;//Used in for loop for parsing packet parameters
 int getData;//Used in FOR loop to get packet 
 int checkData = 0;
 
+///Temporary array
+unsigned char RandomNum[] = "";
 //---------------------------------------------------------------------------------------
 //                AES FUNCTIONS
 //Author: kokke
@@ -987,6 +989,96 @@ void openInterfaces()
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
+//                SESSION KEY _ KDF
+//---------------------------------------------------------------------------------------
+void sessionKeys()
+{
+		//Set d = ceil(Lb / Lh)
+		//If d >= (2Lc), then halt and output invalid
+		//Set z = empty string
+		//For c = 1 to d :
+			//Set z = z || h(s || c || p || t || [u])
+			//Set b = the leftmost L_b bits of z
+			
+	//concatenate the keying materials to create s
+	appendData = 0;
+	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
+	{
+		s[appendData] = Sw_keyMat[getData];
+		appendData++;
+	}
+	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
+	{
+		s[appendData] = ES_keyMat[getData];
+		appendData++;
+	}
+	
+	
+	d = ceil(Lb / Lh);
+	//printf("\nd is: %f\n", d);
+
+	if (d >= (2 * Lc))
+	{
+		printf("\nINVALID\n");
+		exit(EXIT_FAILURE);
+	} //endIF
+
+	for (c = 1; c <= d; c++)
+	{
+		//concatenate input strings: s; p; salt; u;
+		appendData = 0;
+		///(1)s
+		for (getData = 0; getData < 32; getData++)
+		{
+			h[appendData] = s[getData];
+			appendData++;
+		}//endFOR
+		///(2)c
+			h[appendData] = c;
+			appendData++;
+
+		///(3)p
+		for (getData = 0; getData < 8; getData++)
+		{
+			h[appendData] = p[getData];
+			appendData++;
+		}//endFOR
+		///(4)t
+		for (getData = 0; getData < 20; getData++)
+		{
+			h[appendData] = salt[getData];
+			appendData++;
+		}//endFOR
+		///(5)u
+		for (getData = 0; getData < 20; getData++)
+		{
+			h[appendData] = u[getData];
+			appendData++;
+		}//endFOR
+		
+		chaskeyMsgLen = sizeof(h);
+		
+		//call Chaskey
+		chaskey(hash, h, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+		
+		//create z
+		for (appendData = 0; appendData < HASH_LEN; appendData++)
+		{
+			z[appendData] = hash[appendData];
+		}//endFOR
+	}//endFOR
+	
+	printf("\nSession Key:\n");
+	for (appendData = 0; appendData < 32; appendData++)
+	{
+		b[appendData] = z[appendData];
+		printf("%c", b[appendData]);
+	}//endFOR
+	printf("\n");
+}//endSESSION_KEYS*
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
 //                FIRST KE MESSAGE FROM SWITCH TO ES
 					//1)Switch sends E[masterkey](R[Sw]||I[ES]||F[sw]||Nonce[SW])||R[ES]
 //---------------------------------------------------------------------------------------
@@ -1151,6 +1243,67 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		case 0x03:
 			printf("\nKey Establishment Message Type 3 recognized\n");
+			//Retrieve message 3 random number
+			printf("\nSwitch Random Number:\n");
+			appendData = 51;
+			for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
+			{
+				RandomNum[getData] = ES_payload[appendData];//Fill payload array for decryption
+				printf("%c", RandomNum[getData]);
+				appendData++;
+			}//endFOR
+			printf("\n");
+			
+			//Compare R(ES) == R(ES)'
+			if ((0 == memcmp((char*)RandomNum, (char*)Sw_RandomNum, RANDOM_NUM_LEN)))
+			{
+				//Retrieve other parameters
+				appendData = 1;
+				//Parse payload for:
+				printf("\nSwitch Identifier:\n");
+				///(1) I(switch) --> switch Identifier
+				for (getData = 0; getData < IDENTIFIER_LEN; getData++)
+				{
+					ES_swID[getData] = ES_payload[appendData];
+					printf("%c", ES_swID[getData]);
+					appendData++;
+				}
+				printf("\n");
+				printf("\nES Keying Material:\n");
+				///(2) F(ES) --> Keying material
+				for (getData = 0; getData < KEYING_MAT_LEN; getData++)
+				{
+					ES_keyMat[getData] = ES_payload[appendData];
+					printf("%c", ES_keyMat[getData]);
+					appendData++;
+				}
+				printf("\n");
+				printf("\nES Nonce:\n");
+				///(3) N(ES) --> Nonce
+				for (getData = 0; getData < NONCE_LEN; getData++)
+				{
+					ES_Nonce[getData] = ES_payload[appendData];
+					printf("%c", ES_Nonce[getData]);
+					appendData++;
+				}
+				printf("\n");
+
+				//Compare Sw(ES) and Sw(ES)'
+				if ((0 == memcmp((char*)ES_swID, (char*)Sw_SWID, IDENTIFIER_LEN)))
+				{
+					printf("\nNo errors...generating session key\n");
+					//generate session keys
+					//sessionKeys();
+					//create and send message 4
+					//KE_fourthMessage();
+				}
+				else {
+					//otherwise --> close channel
+					printf("\nIdentifier mismatch error!\n");
+					//kdf_failure++;//Increment error count
+					exit(EXIT_FAILURE);
+				}//end_IF_ELSE
+			printf("\n");
 		break;
 		
 		case 0x04:
@@ -1180,6 +1333,9 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		case 0x12:
 		break;
 		
+		case 0x13:
+		break;
+		
 		default: printf("\nUnrecognized message\n");
 		break;
 		}//endSWITCH
@@ -1199,10 +1355,57 @@ void main()
 	//pcap_loop(Channel202, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 0
 	//pcap_loop(Channel203, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 1
         pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
-		
-	openInterfaces();//Open channels for sending and receiving
-	if(msgFlag[0] == 0x01)
-	{
-		KE_secondMessage();//Create and send message 2
-	}
+	
+	do{
+		openInterfaces();//Keep channels open
+		if(msgFlag[0] == 0x01)
+		{
+			KE_secondMessage();//Create and send message 2
+		}
+		if(msgFlag[0] == 0x02)
+		{
+			KE_secondMessage();//Create and send message 3
+		}
+		if(msgFlag[0] == 0x03)
+		{
+			KE_secondMessage();//Create and send message 4
+		}
+		if(msgFlag[0] == 0x04)
+		{
+			KE_secondMessage();//Create and send message 5
+		}
+		if(msgFlag[0] == 0x06)
+		{
+			//Start using key
+		}
+		if(msgFlag[0] == 0x07)
+		{
+			pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
+		}
+		if(msgFlag[0] == 0x08)
+		{
+			KE_secondMessage();//Check if nextSessionKey pointer is NULL
+		}
+		if(msgFlag[0] == 0x09)
+		{
+			KE_secondMessage();//Update currentSessionKey pointer and togglebit
+		}
+		if(msgFlag[0] == 0x10)
+		{
+			//Set currentSessionKey pointer to NULL to revoke keys
+			pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
+		}
+		if(msgFlag[0] == 0x11)
+		{
+			//Increment Key Est. error count and check threshold
+		}
+		if(msgFlag[0] == 0x12)
+		{
+			//Increment MIC verification error count and check threshold
+		}
+		if(msgFlag[0] == 0x13)
+		{
+			//Regular key usage
+		}
+	} while(true) //endDO_WHILE
 }//end_MAIN
