@@ -322,6 +322,7 @@ unsigned char *oldDigest;//Pointer to packet message digest
 unsigned char *newDigest;//Pointer to recalculated message digest
 
 ///Counters
+int counter;
 int keyCheck = 0;
 int key_usage_threshold = 0;
 int key_change_over_threshold = 0;
@@ -847,6 +848,7 @@ void subkeys(unsigned int subkey1[4], unsigned int subkey2[4], const unsigned in
 //Parameters: pointer to hash, hash length,  message, message length, key, subkey 1, subkey 2
 unsigned char* chaskey(unsigned char *hash, const unsigned char *msg, const unsigned int key[4], const unsigned int subkey1[4], const unsigned int subkey2[4])
 {
+	counter++;
 	//const unsigned int msgLen = 5;
 	const unsigned int *M = (unsigned int*)msg;
 	const unsigned int *end = M + (((chaskeyMsgLen - 1) >> 4) << 2); /* pointer to last message block */
@@ -948,6 +950,15 @@ unsigned char* chaskey(unsigned char *hash, const unsigned char *msg, const unsi
 	v[2] ^= last[2];
 	v[3] ^= last[3];
 
+	if (counter == 1)
+	{
+		memcpy(TSNMICinput, ESSession_Key, 16);//Create "input" string with master key
+		memcpy(TSNMICinput + 16, hash, 8);//Append first hash output to "input"
+		chaskeyMsgLen = 48;//Chaskey input is now 48 bytes
+		chaskey(hash, plaintext, ESSession_Key, chaskeySubkey1, chaskeySubkey2);
+	}//if
+
+	counter = 0;//Reset counter
 	memcpy(hash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash  
 }//end_CHASKEY-12
 //---------------------------------------------------------------------------------------
@@ -1336,6 +1347,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		break;
 		
 		case 0x13:
+		counter = 0;
 		break;
 		
 		default: printf("\nUnrecognized message\n");
