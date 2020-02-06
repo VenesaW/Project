@@ -1364,15 +1364,15 @@ void main()
 		}
 		if(msgFlag[0] == 0x02)
 		{
-			KE_secondMessage();//Create and send message 3
+			KE_thirdMessage();//Create and send message 3
 		}
 		if(msgFlag[0] == 0x03)
 		{
-			KE_secondMessage();//Create and send message 4
+			KE_fourthMessage();//Create and send message 4
 		}
 		if(msgFlag[0] == 0x04)
 		{
-			KE_secondMessage();//Create and send message 5
+			KE_fifthMessage();//Create and send message 5
 		}
 		if(msgFlag[0] == 0x06)
 		{
@@ -1380,20 +1380,20 @@ void main()
 		}
 		if(msgFlag[0] == 0x07)
 		{
-			pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
+			//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
 		}
 		if(msgFlag[0] == 0x08)
 		{
-			KE_secondMessage();//Check if nextSessionKey pointer is NULL
+			//Check if nextSessionKey pointer is NULL
 		}
 		if(msgFlag[0] == 0x09)
 		{
-			KE_secondMessage();//Update currentSessionKey pointer and togglebit
+			//Update currentSessionKey pointer and togglebit
 		}
 		if(msgFlag[0] == 0x10)
 		{
 			//Set currentSessionKey pointer to NULL to revoke keys
-			pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
+			//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
 		}
 		if(msgFlag[0] == 0x11)
 		{
