@@ -53,7 +53,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 //Packet lengths (total)
 #define KEY_EST_MSG1_LEN 59 //Length of KEY EST MSG 1 packet
 #define KEY_EST_MSG2_LEN 115 //Length of KEY EST MSG 2 packet
-#define KEY_EST_MSG3_LEN 97 //Length of KEY EST MSG 3 packet
+#define KEY_EST_MSG3_LEN 99 //Length of KEY EST MSG 3 packet
 #define KEY_EST_MSG4_LEN 59 //Length of KEY EST MSG 4 packet
 #define KEY_EST_MSG5_LEN 59 //Length of KEY EST MSG 5 packet
 #define KEY_EST_MSG6_LEN 59 //Length of KEY EST MSG 6 packet
@@ -1245,7 +1245,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\nKey Establishment Message Type 3 recognized\n");
 			//Retrieve message 3 random number
 			printf("\nSwitch Random Number:\n");
-			appendData = 41;
+			appendData = 49;
 			for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 			{
 				RandomNum[getData] = ES_payload[appendData];//Fill payload array for decryption
@@ -1293,7 +1293,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				{
 					printf("\nNo errors...generating session key\n");
 					//generate session keys
-					//sessionKeys();
+					sessionKeys();
 					//create and send message 4
 					//KE_fourthMessage();
 				}
