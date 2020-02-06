@@ -1245,7 +1245,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\nKey Establishment Message Type 3 recognized\n");
 			//Retrieve message 3 random number
 			printf("\nSwitch Random Number:\n");
-			appendData = 51;
+			appendData = 41;
 			for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
 			{
 				RandomNum[getData] = ES_payload[appendData];//Fill payload array for decryption
@@ -1287,7 +1287,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 					appendData++;
 				}
 				printf("\n");
-			}//endIF
 
 				//Compare Sw(ES) and Sw(ES)'
 				if ((0 == memcmp((char*)ES_swID, (char*)Sw_SWID, IDENTIFIER_LEN)))
@@ -1304,6 +1303,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 					//kdf_failure++;//Increment error count
 					exit(EXIT_FAILURE);
 				}//end_IF_ELSE
+			}//endIF
 			printf("\n");
 		break;
 		
