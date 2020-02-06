@@ -952,10 +952,10 @@ unsigned char* chaskey(unsigned char *hash, const unsigned char *msg, const unsi
 
 	if (counter == 1)
 	{
-		memcpy(TSNMICinput, ESSession_Key, 16);//Create "input" string with master key
+		memcpy(TSNMICinput, SwSession_Key, 16);//Create "input" string with master key
 		memcpy(TSNMICinput + 16, hash, 8);//Append first hash output to "input"
 		chaskeyMsgLen = 48;//Chaskey input is now 48 bytes
-		chaskey(hash, plaintext, ESSession_Key, chaskeySubkey1, chaskeySubkey2);
+		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
 	}//if
 
 	counter = 0;//Reset counter
