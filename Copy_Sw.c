@@ -1287,6 +1287,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 					appendData++;
 				}
 				printf("\n");
+			}//endIF
 
 				//Compare Sw(ES) and Sw(ES)'
 				if ((0 == memcmp((char*)ES_swID, (char*)Sw_SWID, IDENTIFIER_LEN)))
@@ -1380,7 +1381,7 @@ void main()
 		}
 		if(msgFlag[0] == 0x07)
 		{
-			//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
+			pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
 		}
 		if(msgFlag[0] == 0x08)
 		{
