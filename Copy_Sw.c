@@ -1407,5 +1407,5 @@ void main()
 		{
 			//Regular key usage
 		}
-	} while(0) //endDO_WHILE
+	} while(0); //endDO_WHILE
 }//end_MAIN
