@@ -1286,6 +1286,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 					printf("%c", ES_Nonce[getData]);
 					appendData++;
 				}
+				
 				printf("\n");
 
 				//Compare Sw(ES) and Sw(ES)'
