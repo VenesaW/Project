@@ -1365,15 +1365,15 @@ void main()
 		}
 		if(msgFlag[0] == 0x02)
 		{
-			KE_thirdMessage();//Create and send message 3
+			//KE_thirdMessage();//Create and send message 3
 		}
 		if(msgFlag[0] == 0x03)
 		{
-			KE_fourthMessage();//Create and send message 4
+			//KE_fourthMessage();//Create and send message 4
 		}
 		if(msgFlag[0] == 0x04)
 		{
-			KE_fifthMessage();//Create and send message 5
+			//KE_fifthMessage();//Create and send message 5
 		}
 		if(msgFlag[0] == 0x06)
 		{
