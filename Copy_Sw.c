@@ -1304,6 +1304,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				if ((0 == memcmp((char*)ES_swID, (char*)Sw_SWID, IDENTIFIER_LEN)))
 				{
 					printf("\nNo errors...generating session key\n");
+					counter = 5;
 					//generate session keys
 					sessionKeys();
 					//create and send message 4
