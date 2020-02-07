@@ -87,6 +87,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 #define CHAS_SUBSTRING 2 //Key length of CHASKEY subkey used in key transformation
 #define HASH_LEN 8 //Size of hash is 8 bytes (16 characters)
 #define KEY_LEN 16 //Key length of 128 bit secret key (32 characters)
+#define KEYING_MATERIAL_LEN 32 //Concatenation of keying materials (FA||FB)
 
 //Thresholds
 #define KEY_UPDATE_MAX 10 //Ensure next session key is available at this point
@@ -302,14 +303,16 @@ double Lh = 64;//bit length of the output of the hash//Chaskey outputs a 64 bit 
 
 int Lc = 32;//bit-length of the binary encoding of the counter c//encoded as a 32-bit, big-endian bit string
 int c;//counter
+int zLEN = 0;
 
-char b[32]= " ";//128 bit key (32 characters) to be extracted from output
-char p[8] = "HMI00001";//Label
-char s[32];//concatenation of keying materials (FA||FB)
-char salt[20] = "AA112233445566778899";
-char u[20] = "AA112233445566778899";//auxilary value
-char h[] = "";
-char z[] = " ";//bit string output of Chaskey from which to take key
+unsigned char b[32] = " ";//128 bit key (32 characters) to be extracted from output
+unsigned char p[8] = "HMI00001";//Label
+unsigned char s[32];//concatenation of keying materials (FA||FB)
+unsigned char salt[20] = "445FF2333EEDAAA75BCC";//salt
+unsigned char u[20] = "667788997E34FAC236E4";//auxilary value
+unsigned char h[80] = " ";
+unsigned char w[80];
+unsigned char z[] = " ";//bit string output of Chaskey from which to take key
 
 ///Regular key usage
 unsigned char hashCalculated[HASH_LEN];//Hash calculated by the switch
@@ -328,6 +331,7 @@ int key_usage_threshold = 0;
 int key_change_over_threshold = 0;
 int kdf_failure = 0;
 int mac_mismatch = 0;
+int toggleBit;
 
 ///For loops
 int appendData;//Used in for loop for parsing packet parameters
@@ -1004,89 +1008,56 @@ void openInterfaces()
 //---------------------------------------------------------------------------------------
 void sessionKeys()
 {
-		//Set d = ceil(Lb / Lh)
-		//If d >= (2Lc), then halt and output invalid
-		//Set z = empty string
-		//For c = 1 to d :
-			//Set z = z || h(s || c || p || t || [u])
-			//Set b = the leftmost L_b bits of z
-			
-	//concatenate the keying materials to create s
-	appendData = 0;
-	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
-	{
-		s[appendData] = Sw_keyMat[getData];
-		appendData++;
-	}
-	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
-	{
-		s[appendData] = ES_keyMat[getData];
-		appendData++;
-	}
-	
-	
 	d = ceil(Lb / Lh);
-	//printf("\nd is: %f\n", d);
-
+	
 	if (d >= (2 * Lc))
 	{
 		printf("\nINVALID\n");
 		exit(EXIT_FAILURE);
 	} //endIF
 
+	//Concatenation of keying materials (FA||FB)
+	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
+	{
+		s[c] = ES_keyMat[c];
+	}//FOR
+	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
+	{
+		s[c+16] = Sw_keyMat[c];
+	}//FOR
+	
+	memcpy(h, s, 32);
+	memcpy(h + 32, p, 8);
+	memcpy(h + 40, salt, 20);
+	memcpy(h + 60, u, 20);
+
+	memcpy(w, p, 8);
+	memcpy(w + 8, s, 32);
+	memcpy(w + 40, u, 20);
+	memcpy(w + 60, salt, 20);
+
+	chaskeyMsgLen = 80;
+
+	printf("\nSession Key:\n");
 	for (c = 1; c <= d; c++)
 	{
-		//concatenate input strings: s; p; salt; u;
-		appendData = 0;
-		///(1)s
-		for (getData = 0; getData < 32; getData++)
+		if (c == 1)
 		{
-			h[appendData] = s[getData];
-			appendData++;
-		}//endFOR
-		///(2)c
-			h[appendData] = c;
-			appendData++;
+			chaskey(hash, h, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+		}
+		if (c >= 2)
+		{
+			chaskey(hash, w, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+		}
+	}//FOR
 
-		///(3)p
-		for (getData = 0; getData < 8; getData++)
-		{
-			h[appendData] = p[getData];
-			appendData++;
-		}//endFOR
-		///(4)t
-		for (getData = 0; getData < 20; getData++)
-		{
-			h[appendData] = salt[getData];
-			appendData++;
-		}//endFOR
-		///(5)u
-		for (getData = 0; getData < 20; getData++)
-		{
-			h[appendData] = u[getData];
-			appendData++;
-		}//endFOR
-		
-		chaskeyMsgLen = sizeof(h);
-		
-		//call Chaskey
-		chaskey(hash, h, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
-		
-		//create z
-		for (appendData = 0; appendData < HASH_LEN; appendData++)
-		{
-			z[appendData] = hash[appendData];
-		}//endFOR
-	}//endFOR
-	
-	printf("\nSession Key:\n");
-	for (appendData = 0; appendData < 32; appendData++)
+	for (getData = 0; getData < hashLen; getData++)
 	{
-		b[appendData] = z[appendData];
-		printf("%c", b[appendData]);
-	}//endFOR
+		printf("%02x", hash[getData]);
+	}
+	
 	printf("\n");
-}//endSESSION_KEYS*
+}//endSESSION_KEYS
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
@@ -1224,8 +1195,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
     printf("Grabbed packet of length %d\n", header->len);
 	printf("\n---------------------------------------------------------------------\n");
 	printf("\n");
-	
-	pcap_breakloop(Channel204);
 	
 	//Retrieve  flag and call appropriate function 
 	for (getData = OFFSET; getData < FLAG_LEN; getData++)
