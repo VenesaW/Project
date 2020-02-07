@@ -1055,7 +1055,7 @@ void sessionKeys()
 
 	for (getData = 0; getData < KEYING_MATERIAL_LEN; getData++)
 	{
-		printf("%c", z[getData]);
+		printf("%02x", z[getData]);
 	}
 	
 	printf("\n");
