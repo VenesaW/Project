@@ -1044,16 +1044,18 @@ void sessionKeys()
 		if (c == 1)
 		{
 			chaskey(hash, h, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+			memcpy(z, hash, 8);
 		}
 		if (c >= 2)
 		{
 			chaskey(hash, w, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+			memcpy(z + 8, hash, 8);
 		}
 	}//FOR
 
-	for (getData = 0; getData < hashLen; getData++)
+	for (getData = 0; getData < KEYING_MATERIAL_LEN; getData++)
 	{
-		printf("%c", hash[getData]);
+		printf("%c", z[getData]);
 	}
 	
 	printf("\n");
