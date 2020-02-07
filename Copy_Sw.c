@@ -1053,7 +1053,7 @@ void sessionKeys()
 
 	for (getData = 0; getData < hashLen; getData++)
 	{
-		printf("%02x", hash[getData]);
+		printf("%c", hash[getData]);
 	}
 	
 	printf("\n");
