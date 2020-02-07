@@ -211,7 +211,7 @@ char* SwMaster_Key = "AA112233445566778899AABBCCDDEEFF";//pointer to master key 
 
 ///Session Key paramaters
 unsigned int SwSession_Key[KEY_LEN] = { 0x833D3433, 0x009F389F, 0x2398E64F, 0x417ACF39 };//master key as hex
-unsigned char sessionKey[33] = "833D3433009F389F2398E64F417ACF39";//master key as hex
+unsigned char sessionKey[32] = "833D3433009F389F2398E64F417ACF39";//master key as hex
 unsigned int chaskeySubkey1[KEY_LEN];//subkey1
 unsigned int chaskeySubkey2[KEY_LEN];//subkey2
 unsigned int chaskeyMsgLen;
@@ -1053,7 +1053,7 @@ void sessionKeys()
 		}
 	}//FOR
 
-	for (getData = 0; getData < KEYING_MATERIAL_LEN; getData++)
+	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
 	{
 		printf("%02x", z[getData]);
 	}
