@@ -1642,7 +1642,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		//Retrieve MIC
 		printf("\n\nIncoming MIC: \n");
-		appendData = 445
+		appendData = 445;
 		for (getData = 0; getData < 3; getData++)
 		{
 			hashValue[getData] = ES_payload[appendData];//Fill payload array for decryption
