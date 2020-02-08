@@ -1639,22 +1639,14 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			plaintext[appendData] = ES_payload[getData];//Fill payload array for decryption
 			appendData++;
 		}//endFOR
-		printf("\n\n");
+		printf("\n");
+		//Retrieve MIC
 		appendData = 445;
 		for (getData = 0; getData < hashLen; getData++)
 		{
 			hashValue[getData] = ES_payload[appendData];
 			printf("%02x", ES_payload[appendData]);
 			appendData++;
-		}//endFOR
-		
-		//Retrieve MIC
-		/*printf("\n\nIncoming MIC: \n");
-		appendData = 445;
-		for (getData = 0; getData < 3; getData++)
-		{
-			hashValue[getData] = ES_payload[appendData];//Fill payload array for decryption
-			printf("%02x", hashValue[getData]);
 		}//endFOR
 		
 		//MAC generation
