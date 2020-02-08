@@ -1643,7 +1643,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		//Retrieve MIC
 		printf("\n\nIncoming MIC: \n");
-		for (getData = 0; getData < 4; getData++)
+		for (getData = 0; getData < 1; getData++)
 		{
 			printf("%02x", oldDigest[getData]);
 		}//endFOR
