@@ -1640,7 +1640,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			//printf("%02x", plaintext[appendData]);
 			appendData++;
 		}//endFOR
-		printf("\n");
+		printf("\n\nIncoming MIC: \n");
 		//Retrieve MIC
 		appendData = 445;
 		for (getData = 0; getData < hashLen; getData++)
@@ -1650,7 +1650,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			appendData++;
 		}//endFOR
 		
-		
 		//MAC generation
 		//Calculate hash and compare to appended hash
 		chaskeyMsgLen = 444;
@@ -1659,6 +1658,11 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
 		newDigest[4] = toggleBit[0];//Insert toggle bit
+		printf("\n\nCalculated MIC: \n");
+		for (getData = 0; getData < hashLen; getData++)
+		{
+			printf("%02x", newDigest[getData]);
+		}//endFOR
 		//Compare Hashes
 		if ((0 == memcmp((char*)hashValue, (char*)newDigest, HASH_LEN)))
 		{
