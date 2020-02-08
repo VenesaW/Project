@@ -37,7 +37,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 #define INTERFACE_MODE 1 //Put interface in promiscuous mode (1) or non-promiscuous mode (0)
 #define PACKET_DATA 486 //Example AFDX message with 486 bytes of data
 #define PACKET_PAYLOAD 444 //Example AFDX message with 486 bytes of data - 444 bytes form the payload
-#define PACKET_SIZE 494 //Example AFDX message with 486 bytes of data and a 32 byte message digest
+#define PACKET_SIZE 495 //Example AFDX message with 486 bytes of data and a 32 byte message digest
 #define PCAP_NETMASK_UNKNOWN 0xffffffff//default netmask
 #define READ_TIMEOUT 1000 //The packet buffer timeout in milliseconds ->0 means no timeout (slows down the code execution)
 #define TAG_LEN 1 //1 Byte
@@ -61,7 +61,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 #define KEY_EST_MSG8_LEN 44 //Length of KEY EST MSG 8 packet
 #define KEY_EST_MSG9_LEN 44 //Length of KEY EST MSG 9 packet
 #define KEY_EST_MSG10_LEN 75 //Length of KEY EST MSG 10 packet
-#define REG_MSG13_LEN 494 //Length of MSG 13 packet
+#define REG_MSG13_LEN 495 //Length of MSG 13 packet
 #define NONCE_LEN 16 //16 Byte random number (Nonce) for key establishment
 #define RANDOM_NUM_LEN 16 //16 Byte random number (Nonce) for key establishment
 #define KEYING_MAT_LEN 16 //16 Byte keying material for key establishment
@@ -1620,9 +1620,9 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		}//endFOR
 
 		//Retrieve toggle bit
-		incomingToggleBit[0] = ES_payload[447];
-		printf("\n Current toggle bit:%02x", toggleBit[0]);
-		printf("\n Incoming toggle bit:%02x", incomingToggleBit[0]);
+		incomingToggleBit[0] = ES_payload[448];
+		printf("\nCurrent toggle bit:%02x", toggleBit[0]);
+		printf("\nIncoming toggle bit:%02x", incomingToggleBit[0]);
 		if (incomingToggleBit[0] != toggleBit[0])
 		{
 			//update session key pointer
