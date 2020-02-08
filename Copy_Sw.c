@@ -54,7 +54,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 #define KEY_EST_MSG1_LEN 59 //Length of KEY EST MSG 1 packet
 #define KEY_EST_MSG2_LEN 115 //Length of KEY EST MSG 2 packet
 #define KEY_EST_MSG3_LEN 107 //Length of KEY EST MSG 3 packet
-#define KEY_EST_MSG4_LEN 59 //Length of KEY EST MSG 4 packet
+#define KEY_EST_MSG4_LEN 74 //Length of KEY EST MSG 4 packet
 #define KEY_EST_MSG5_LEN 59 //Length of KEY EST MSG 5 packet
 #define KEY_EST_MSG6_LEN 59 //Length of KEY EST MSG 6 packet
 #define KEY_EST_MSG7_LEN 59 //Length of KEY EST MSG 7 packet
@@ -218,6 +218,7 @@ unsigned int chaskeyMsgLen;
 unsigned int hashLen = 8;
 unsigned char TSNMICinput[] = "";//TSNMIC concatenated payload
 unsigned char msgFlag[] = "";//Array to hold message flag
+unsigned char toggleBit [] = "";//Toggle bit for key management;
 
 ///hash codes and encrypted packets
 unsigned char hash[HASH_LEN];//memory area for chaskey output hash; should be at most 128-bits (32 characters; 16 bytes)
@@ -331,7 +332,6 @@ int key_usage_threshold = 0;
 int key_change_over_threshold = 0;
 int kdf_failure = 0;
 int mac_mismatch = 0;
-int toggleBit;
 
 ///For loops
 int appendData;//Used in for loop for parsing packet parameters
@@ -1004,6 +1004,96 @@ void openInterfaces()
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
+//                FIFTH KDF MESSAGE TO Switch
+				//1) The ES sends the hash of the challenge
+//---------------------------------------------------------------------------------------
+void KE_fourthMessage()
+{
+	 //Build packet for message 4 and encrypt the payload
+        //dst_MAC (ES4, VL1)
+    msg4_packet[0] = (0x45);//E
+    msg4_packet[1] = (0x53);//S
+    msg4_packet[2] = (0x34);//4
+    msg4_packet[3] = (0x56);//V
+    msg4_packet[4] = (0x4c);//L
+    msg4_packet[5] = (0x31);//1
+        //src_MAC (Switch)
+    msg4_packet[6] = (0xaa);
+    msg4_packet[7] = (0xbb);
+    msg4_packet[8] = (0xcc);
+    msg4_packet[9] = (0x05);
+    msg4_packet[10] = (0x05);
+    msg4_packet[11] = (0x51);//PC
+        //ether_type
+    msg4_packet[12] = (0x08);
+    msg4_packet[13] = (0x00);
+    //IPv4
+    msg4_packet[14] = (0x45);
+    msg4_packet[15] = (0x00);
+    //total_length
+    msg4_packet[16] = (0x00);
+    msg4_packet[17] = (0x1a);//26 bytes
+    //identification
+    msg4_packet[18] = (0x1d);
+    msg4_packet[19] = (0x94);//random
+    //flags
+    msg4_packet[20] = (0x00);
+    //fragment
+    msg4_packet[21] = (0x00);
+    //ttl
+    msg4_packet[22] = (0x01);
+    //protocol
+    msg4_packet[23] = (0x11);
+    //ip_checksum
+    msg4_packet[24] = (0x91);
+    msg4_packet[25] = (0x6e);
+    //src_ip
+    msg4_packet[26] = (0xc0);
+    msg4_packet[27] = (0xa8);
+    msg4_packet[28] = (0xb2);
+    msg4_packet[29] = (0x5c);//random
+        //dst_ip
+    msg4_packet[30] = (0xc0);
+    msg4_packet[31] = (0xa8);
+    msg4_packet[32] = (0xb2);
+    msg4_packet[33] = (0x5a);//random
+        //src_port
+    msg4_packet[34] = (0x04);
+    msg4_packet[35] = (0x15);//random
+    //dst_port
+    msg4_packet[36] = (0x04);
+    msg4_packet[37] = (0x16);//random
+    //udp_length
+    msg4_packet[38] = (0x00);
+    msg4_packet[39] = (0x12);//18 bytes
+    //udp_checksum
+    msg4_packet[40] = (0xaa);
+    msg4_packet[41] = (0xff);//random
+
+	chaskeyMsgLen = 16;
+	//Generate challenge response
+	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
+	memcpy(Sw_challengeHash, hash, HASH_LEN);
+
+	//Append flag
+	msg4_packet[42] = (0x04);//Key est msg 4 flag
+	
+	appendData = 43;
+	for (getData = 0; getData < 32; getData++)
+	{
+		msg4_packet[appendData] = Sw_challenge[getData];
+		appendData++;
+	}//endFOR
+	
+	//send packet
+	pcap_sendpacket(Channel204, msg4_packet, KEY_EST_MSG4_LEN);//KDF message 5 packet
+	
+	//listen for KE message 5 from ES
+	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+}//end_KE_FOURTH_MESSAGE
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
 //                SESSION KEY _ KDF
 //---------------------------------------------------------------------------------------
 void sessionKeys()
@@ -1278,8 +1368,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 					counter = 5;
 					//generate session keys
 					sessionKeys();
-					//create and send message 4
-					//KE_fourthMessage();
 				}
 				else {
 					//otherwise --> close channel
@@ -1295,6 +1383,10 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		break;
 		
 		case 0x05:
+			printf("\nKey Establishment Message Type 5 recognized\n");
+			//Retrieve message 5 challenge response
+			//Retrieve toggle bit;
+			printf("\nChallenge response:\n");
 		break;
 		
 		case 0x06:
@@ -1354,11 +1446,15 @@ void main()
 		}
 		if(msgFlag[0] == 0x03)
 		{
-			//KE_fourthMessage();//Create and send message 4
+			KE_fourthMessage();//Create and send message 4
 		}
 		if(msgFlag[0] == 0x04)
 		{
 			//KE_fifthMessage();//Create and send message 5
+		}
+		if(msgFlag[0] == 0x05)
+		{
+			//Send either message 6 or 7
 		}
 		if(msgFlag[0] == 0x06)
 		{
