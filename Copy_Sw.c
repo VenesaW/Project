@@ -1446,6 +1446,7 @@ void main()
 		}
 		if(msgFlag[0] == 0x03)
 		{
+			printf("\ncalling msg 4 fn\n");
 			KE_fourthMessage();//Create and send message 4
 		}
 		if(msgFlag[0] == 0x04)
