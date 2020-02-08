@@ -1631,6 +1631,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			toggleBit[0] = incomingToggleBit[0];
 		}//endIF	
 
+		printf("\n\n");
 		//Retrieve payload
 		appendData = 0;
 		for (getData = 1; getData < PACKET_PAYLOAD + 1; getData++)
@@ -1639,7 +1640,12 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("%02x", plaintext[appendData]);
 			appendData++;
 		}//endFOR
-		printf("\n");
+		printf("\n\n");
+		
+		for (getData = 0; getData < hashLen; getData++)
+		{
+			printf("%02x", ES_payload[[getData]);
+		}//endFOR
 		
 		//Retrieve MIC
 		/*printf("\n\nIncoming MIC: \n");
