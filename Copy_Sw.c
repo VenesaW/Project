@@ -1621,7 +1621,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		}//endFOR
 
 		//Retrieve toggle bit
-		incomingToggleBit[0] = oldDigest[4];
+		incomingToggleBit[0] = oldDigest[3];
 		printf("\nCurrent toggle bit:%02x", toggleBit[0]);
 		printf("\nIncoming toggle bit:%02x", incomingToggleBit[0]);
 		if (incomingToggleBit[0] != toggleBit[0])
@@ -1643,9 +1643,9 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		//Retrieve MIC
 		printf("\n\nIncoming MIC: \n");
-		for (getData = 0; getData < 5; getData++)
+		for (getData = 0; getData < 4; getData++)
 		{
-			printf("%02x", ES_payload[getData]);
+			printf("%02x", oldDigest[getData]);
 		}//endFOR
 
 		//MAC generation
