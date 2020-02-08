@@ -1637,13 +1637,13 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		for (getData = 1; getData < PACKET_PAYLOAD + 1; getData++)
 		{
 			plaintext[appendData] = ES_payload[getData];//Fill payload array for decryption
-			printf("%02x", plaintext[appendData]);
 			appendData++;
 		}//endFOR
 		printf("\n\n");
 		appendData = 445;
 		for (getData = 0; getData < hashLen; getData++)
 		{
+			hashValue[getData] = ES_payload[appendData];
 			printf("%02x", ES_payload[appendData]);
 			appendData++;
 		}//endFOR
