@@ -1153,7 +1153,7 @@ void regularUsage()
 //                SUCCESS/FAILURE KDF MESSAGE TO Switch
 				//1) The ES sends the hash of the challenge
 //---------------------------------------------------------------------------------------
-void KE_sixthMsg()
+void KE_sixthMessage()
 {
 	//Build packet for message 4 and encrypt the payload
 	   //dst_MAC (ES4, VL1)
