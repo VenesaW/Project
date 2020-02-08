@@ -1004,6 +1004,65 @@ void openInterfaces()
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
+//                SESSION KEY _ KDF
+//---------------------------------------------------------------------------------------
+void sessionKeys()
+{
+	d = ceil(Lb / Lh);
+	
+	if (d >= (2 * Lc))
+	{
+		printf("\nINVALID\n");
+		exit(EXIT_FAILURE);
+	} //endIF
+
+	//Concatenation of keying materials (FA||FB)
+	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
+	{
+		s[c] = ES_keyMat[c];
+	}//FOR
+	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
+	{
+		s[c+16] = Sw_keyMat[c];
+	}//FOR
+	
+	memcpy(h, s, 32);
+	memcpy(h + 32, p, 8);
+	memcpy(h + 40, salt, 20);
+	memcpy(h + 60, u, 20);
+
+	memcpy(w, p, 8);
+	memcpy(w + 8, s, 32);
+	memcpy(w + 40, u, 20);
+	memcpy(w + 60, salt, 20);
+
+	chaskeyMsgLen = 80;
+
+	printf("\nSession Key:\n");
+	for (c = 1; c <= d; c++)
+	{
+		if (c == 1)
+		{
+			chaskey(hash, h, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+			memcpy(z, hash, 8);
+		}
+		if (c >= 2)
+		{
+			chaskey(hash, w, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+			memcpy(z + 8, hash, 8);
+		}
+	}//FOR
+
+	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
+	{
+		printf("%02x", z[getData]);
+	}
+	
+	printf("\n");
+}//endSESSION_KEYS
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
 //                FIFTH KDF MESSAGE TO Switch
 				//1) The ES sends the hash of the challenge
 //---------------------------------------------------------------------------------------
@@ -1091,65 +1150,6 @@ void KE_fourthMessage()
 	//listen for KE message 5 from ES
 	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 }//end_KE_FOURTH_MESSAGE
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//---------------------------------------------------------------------------------------
-//                SESSION KEY _ KDF
-//---------------------------------------------------------------------------------------
-void sessionKeys()
-{
-	d = ceil(Lb / Lh);
-	
-	if (d >= (2 * Lc))
-	{
-		printf("\nINVALID\n");
-		exit(EXIT_FAILURE);
-	} //endIF
-
-	//Concatenation of keying materials (FA||FB)
-	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
-	{
-		s[c] = ES_keyMat[c];
-	}//FOR
-	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
-	{
-		s[c+16] = Sw_keyMat[c];
-	}//FOR
-	
-	memcpy(h, s, 32);
-	memcpy(h + 32, p, 8);
-	memcpy(h + 40, salt, 20);
-	memcpy(h + 60, u, 20);
-
-	memcpy(w, p, 8);
-	memcpy(w + 8, s, 32);
-	memcpy(w + 40, u, 20);
-	memcpy(w + 60, salt, 20);
-
-	chaskeyMsgLen = 80;
-
-	printf("\nSession Key:\n");
-	for (c = 1; c <= d; c++)
-	{
-		if (c == 1)
-		{
-			chaskey(hash, h, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
-			memcpy(z, hash, 8);
-		}
-		if (c >= 2)
-		{
-			chaskey(hash, w, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
-			memcpy(z + 8, hash, 8);
-		}
-	}//FOR
-
-	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
-	{
-		printf("%02x", z[getData]);
-	}
-	
-	printf("\n");
-}//endSESSION_KEYS
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
@@ -1366,8 +1366,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				{
 					printf("\nNo errors...generating session key\n");
 					counter = 5;
-					//generate session keys
-					sessionKeys();
 				}
 				else {
 					//otherwise --> close channel
@@ -1446,6 +1444,8 @@ void main()
 		}
 		if(msgFlag[0] == 0x03)
 		{
+			//generate session keys
+			sessionKeys();
 			printf("\ncalling msg 4 fn\n");
 			KE_fourthMessage();//Create and send message 4
 		}
