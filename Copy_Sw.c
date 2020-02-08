@@ -1645,8 +1645,8 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		printf("\n\nIncoming MIC: \n");
 		for (getData = 0; getData < hashLen; getData++)
 		{
-			hashValue[appendData] = oldDigest[getData];//Fill payload array for decryption
-			printf("\n%02x\n", hashValue[getData]);
+			//hashValue[appendData] = oldDigest[getData];//Fill payload array for decryption
+			printf("%02x", oldDigest[getData]);
 		}//endFOR
 		
 		//MAC generation
