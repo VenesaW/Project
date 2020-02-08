@@ -1153,7 +1153,7 @@ void regularUsage()
 //                SUCCESS/FAILURE KDF MESSAGE TO Switch
 				//1) The ES sends the hash of the challenge
 //---------------------------------------------------------------------------------------
-void KE_successMsg()
+void KE_sixthMsg()
 {
 	//Build packet for message 4 and encrypt the payload
 	   //dst_MAC (ES4, VL1)
@@ -1230,7 +1230,7 @@ void KE_successMsg()
 	pcap_sendpacket(Channel204, msg6_packet, KEY_EST_MSG6_LEN);//KDF message 5 packet
 	//listen for messages from ES
 	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
-}//end_KE_SUCCESS_MESSAGE
+}//end_KE_SIXTH_MESSAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //---------------------------------------------------------------------------------------
@@ -1581,7 +1581,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		if ((0 == memcmp((char*)challengeVal, (char*)Sw_challengeHash, HASH_LEN)))
 		{
 			printf("\nChallenge successful...Session key stored\n");
-			msgFlag[0] = (0x13);
+			msgFlag[0] = (0x06);
 		}
 		else {
 			printf("\nChallenge unsuccessful...Session key destroyed\n");
@@ -1722,6 +1722,7 @@ void main()
 		if (msgFlag[0] == 0x06)
 		{
 			//Start using key
+			KE_sixthMessage();//Create and send message 4
 		}
 		if (msgFlag[0] == 0x07)
 		{
