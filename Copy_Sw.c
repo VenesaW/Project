@@ -1641,10 +1641,11 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			appendData++;
 		}//endFOR
 		printf("\n\n");
-		
+		appendData = 445
 		for (getData = 0; getData < hashLen; getData++)
 		{
-			printf("%02x", ES_payload[getData]);
+			printf("%02x", ES_payload[appendData]);
+			appendData++;
 		}//endFOR
 		
 		//Retrieve MIC
