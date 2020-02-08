@@ -1643,10 +1643,9 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		//Retrieve MIC
 		printf("\n\nIncoming MIC: \n");
-		for (getData = 0; getData < hashLen; getData++)
+		for (getData = 0; getData < 5; getData++)
 		{
-			hashValue[getData] = oldDigest[getData];//Fill hash from incoming message
-			printf("%02x", hashValue[getData]);
+			printf("%02x", ES_payload[getData]);
 		}//endFOR
 
 		//MAC generation
