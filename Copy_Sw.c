@@ -1132,6 +1132,7 @@ void KE_fourthMessage()
 
 	chaskeyMsgLen = 16;
 	//Generate challenge response
+	counter = 5;
 	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
 	printf("\nSw Challenge hash:\n");
 	for (getData = 0; getData < hashLen; getData++)
@@ -1145,9 +1146,9 @@ void KE_fourthMessage()
 	msg4_packet[42] = (0x04);//Key est msg 4 flag
 	
 	appendData = 43;
-	for (getData = 0; getData < 32; getData++)
+	for (getData = 0; getData < hashLen; getData++)
 	{
-		msg4_packet[appendData] = Sw_challenge[getData];
+		msg4_packet[appendData] = hash[getData];
 		appendData++;
 	}//endFOR
 	
@@ -1403,7 +1404,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\nSw Challenge response:\n");
 			for (getData = 0; getData < hashLen; getData++)
 			{
-				printf("%02x", challengeVal[getData]);
+				printf("%02x", Sw_challengeHash[getData]);
 			}//endFOR
 			printf("\n");
 			//Compare H(Sw) == H(ES)
