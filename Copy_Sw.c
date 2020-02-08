@@ -1646,10 +1646,10 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
 		counter = 0;
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
-		hash[4] = toggleBit[0];//Insert toggle bit
-		//memcpy(hash, newDigest, HASH_LEN);//Copy hash to message digest array	
+		memcpy(hash, newDigest, HASH_LEN);//Copy hash to message digest array	
+		newDigest[4] = toggleBit[0];//Insert toggle bit
 		//Compare Hashes
-		if ((0 == memcmp((char*)hashValue, (char*)hash, HASH_LEN)))
+		if ((0 == memcmp((char*)hashValue, (char*)newDigest, HASH_LEN)))
 		{
 			printf("\n\n>>>>hashes match....forwarding packing to outbound port\n\n");
 			printf("\n\nCalculating new MIC\n");
