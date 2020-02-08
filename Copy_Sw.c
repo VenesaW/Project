@@ -1637,7 +1637,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		for (getData = 1; getData < PACKET_PAYLOAD + 1; getData++)
 		{
 			plaintext[appendData] = ES_payload[getData];//Fill payload array for decryption
-			printf("%02x", plaintext[appendData]);
+			//printf("%02x", plaintext[appendData]);
 			appendData++;
 		}//endFOR
 		printf("\n");
