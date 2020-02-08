@@ -1641,7 +1641,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		}//endFOR
 		printf("\n");
 		
-		//Retrieve MIC
+		/*//Retrieve MIC
 		printf("\n\nIncoming MIC: \n");
 		printf("%02x", oldDigest[0]);
 
@@ -1678,7 +1678,8 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\n---------------------------------------------------------------------\n");
 			//increment error counter
 			//countinue listening until error threshold*************************************************************
-		}//endIF_ELSE
+		}//endIF_ELSE*/
+		printf("\nexit?\n");
 		break;
 
 	default: printf("\nUnrecognized message\n");
