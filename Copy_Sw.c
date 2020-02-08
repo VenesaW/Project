@@ -978,32 +978,32 @@ unsigned char* chaskey(unsigned char *hash, const unsigned char *msg, const unsi
 	//a) Call function to select interface
 void openInterfaces()
 {
-//Port 4 (Eth0.201)
-    Channel201 = pcap_open_live(Interface201, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 4
-    pcap_setdirection(Channel201, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel201, &compiledCode, "dst port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
-    pcap_setfilter(Channel201, &compiledCode);//Apply filter to incoming traffic
+	//Port 4 (Eth0.201)
+	Channel201 = pcap_open_live(Interface201, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 4
+	pcap_setdirection(Channel201, PCAP_D_IN);//Sniff incoming traffic
+	pcap_compile(Channel201, &compiledCode, "dst port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+	pcap_setfilter(Channel201, &compiledCode);//Apply filter to incoming traffic
 //Port 0 (Eth0.202)
-    Channel202 = pcap_open_live(Interface202, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 0
-    pcap_setdirection(Channel202, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel202, &compiledCode, "dst port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
-    pcap_setfilter(Channel202, &compiledCode);//Apply filter to incoming traffic
+	Channel202 = pcap_open_live(Interface202, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 0
+	pcap_setdirection(Channel202, PCAP_D_IN);//Sniff incoming traffic
+	pcap_compile(Channel202, &compiledCode, "dst port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+	pcap_setfilter(Channel202, &compiledCode);//Apply filter to incoming traffic
 //Port 1 (Eth0.203)
-    Channel203 = pcap_open_live(Interface203, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 1
-    pcap_setdirection(Channel203, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel203, &compiledCode, "dst port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
-    pcap_setfilter(Channel203, &compiledCode);//Apply filter to incoming traffic
+	Channel203 = pcap_open_live(Interface203, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 1
+	pcap_setdirection(Channel203, PCAP_D_IN);//Sniff incoming traffic
+	pcap_compile(Channel203, &compiledCode, "dst port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+	pcap_setfilter(Channel203, &compiledCode);//Apply filter to incoming traffic
 //Port 2 (Eth0.204)
-    Channel204 = pcap_open_live(Interface204, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 2
-    pcap_setdirection(Channel204, PCAP_D_IN);//Sniff incoming traffic
-    pcap_compile(Channel204, &compiledCode, "dst port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
-    pcap_setfilter(Channel204, &compiledCode);//Apply filter to incoming traffic
+	Channel204 = pcap_open_live(Interface204, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//Open incoming channel on port 2
+	pcap_setdirection(Channel204, PCAP_D_IN);//Sniff incoming traffic
+	pcap_compile(Channel204, &compiledCode, "dst port 1045", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
+	pcap_setfilter(Channel204, &compiledCode);//Apply filter to incoming traffic
 
-    //All channels opened or not
-    if ((Channel201 == NULL) || (Channel202 == NULL) || (Channel203 == NULL) || (Channel204 == NULL)) {
-        printf("pcap_open_live() failed due to [%s]\n", errorBuffer);//At least one channel could not be opened
-        exit(EXIT_FAILURE);//Exit program
-    }//endIF
+	//All channels opened or not
+	if ((Channel201 == NULL) || (Channel202 == NULL) || (Channel203 == NULL) || (Channel204 == NULL)) {
+		printf("pcap_open_live() failed due to [%s]\n", errorBuffer);//At least one channel could not be opened
+		exit(EXIT_FAILURE);//Exit program
+	}//endIF
 }//endOPEN_INTERFACES
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1013,7 +1013,7 @@ void openInterfaces()
 void sessionKeys()
 {
 	d = ceil(Lb / Lh);
-	
+
 	if (d >= (2 * Lc))
 	{
 		printf("\nINVALID\n");
@@ -1027,9 +1027,9 @@ void sessionKeys()
 	}//FOR
 	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
 	{
-		s[c+16] = Sw_keyMat[c];
+		s[c + 16] = Sw_keyMat[c];
 	}//FOR
-	
+
 	memcpy(h, s, 32);
 	memcpy(h + 32, p, 8);
 	memcpy(h + 40, salt, 20);
@@ -1061,7 +1061,7 @@ void sessionKeys()
 	{
 		printf("%02x", z[getData]);
 	}
-	
+
 	printf("\n");
 }//endSESSION_KEYS
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1094,27 +1094,27 @@ void regularUsage()
 		//ether_type
 	packet[12] = (0x08);
 	packet[13] = (0x00);
-		//IPv4
+	//IPv4
 	packet[14] = (0x45);
 	packet[15] = (0x00);
-		//total_length
+	//total_length
 	packet[16] = (0x00);
 	packet[17] = (0x1a);
-		//identification
+	//identification
 	packet[18] = (0x1d);
 	packet[19] = (0x94);
-		//flags
+	//flags
 	packet[20] = (0x00);
-		//fragment
+	//fragment
 	packet[21] = (0x00);
-		//ttl
+	//ttl
 	packet[22] = (0x01);
-		//protocol
+	//protocol
 	packet[23] = (0x11);
-		//ip_checksum
+	//ip_checksum
 	packet[24] = (0x91);
 	packet[25] = (0x6e);
-		//src_ip
+	//src_ip
 	packet[26] = (0xc0);
 	packet[27] = (0xa8);
 	packet[28] = (0xb2);
@@ -1127,22 +1127,22 @@ void regularUsage()
 		//src_port
 	packet[34] = (0x04);
 	packet[35] = (0x15);
-		//dst_port
+	//dst_port
 	packet[36] = (0x04);
 	packet[37] = (0x16);
-		//udp_length
+	//udp_length
 	packet[38] = (0x01);
 	packet[39] = (0x07);
-		//udp_checksum
+	//udp_checksum
 	packet[40] = (0x00);
 	packet[41] = (0x00);
 
 	//Append flag
 	packet[42] = (0x13);//Message 13 flag
-	
-	memcpy(packet + 42, plaintext, 452);	
 
-  	//send packet
+	memcpy(packet + 42, plaintext, 452);
+
+	//send packet
 	pcap_sendpacket(Channel204, packet, REG_MSG13_LEN);//Message 13 packet
 	//listen for messages from ES
 	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
@@ -1155,77 +1155,77 @@ void regularUsage()
 //---------------------------------------------------------------------------------------
 void KE_successMsg()
 {
-	 //Build packet for message 4 and encrypt the payload
-        //dst_MAC (ES4, VL1)
-    msg6_packet[0] = (0x45);//E
-    msg6_packet[1] = (0x53);//S
-    msg6_packet[2] = (0x34);//4
-    msg6_packet[3] = (0x56);//V
-    msg6_packet[4] = (0x4c);//L
-    msg6_packet[5] = (0x31);//1
-        //src_MAC (Switch)
-    msg6_packet[6] = (0xaa);
-    msg6_packet[7] = (0xbb);
-    msg6_packet[8] = (0xcc);
-    msg6_packet[9] = (0x05);
-    msg6_packet[10] = (0x05);
-    msg6_packet[11] = (0x51);//PC
-        //ether_type
-    msg6_packet[12] = (0x08);
-    msg6_packet[13] = (0x00);
-    //IPv4
-    msg6_packet[14] = (0x45);
-    msg6_packet[15] = (0x00);
-    //total_length
-    msg6_packet[16] = (0x00);
-    msg6_packet[17] = (0x1a);//26 bytes
-    //identification
-    msg6_packet[18] = (0x1d);
-    msg6_packet[19] = (0x94);//random
-    //flags
-    msg6_packet[20] = (0x00);
-    //fragment
-    msg6_packet[21] = (0x00);
-    //ttl
-    msg6_packet[22] = (0x01);
-    //protocol
-    msg6_packet[23] = (0x11);
-    //ip_checksum
-    msg6_packet[24] = (0x91);
-    msg6_packet[25] = (0x6e);
-    //src_ip
-    msg6_packet[26] = (0xc0);
-    msg6_packet[27] = (0xa8);
-    msg6_packet[28] = (0xb2);
-    msg6_packet[29] = (0x5c);//random
-        //dst_ip
-    msg6_packet[30] = (0xc0);
-    msg6_packet[31] = (0xa8);
-    msg6_packet[32] = (0xb2);
-    msg6_packet[33] = (0x5a);//random
-        //src_port
-    msg6_packet[34] = (0x04);
-    msg6_packet[35] = (0x15);//random
-    //dst_port
-    msg6_packet[36] = (0x04);
-    msg6_packet[37] = (0x16);//random
-    //udp_length
-    msg6_packet[38] = (0x00);
-    msg6_packet[39] = (0x12);//18 bytes
-    //udp_checksum
-    msg6_packet[40] = (0xaa);
-    msg6_packet[41] = (0xff);//random
+	//Build packet for message 4 and encrypt the payload
+	   //dst_MAC (ES4, VL1)
+	msg6_packet[0] = (0x45);//E
+	msg6_packet[1] = (0x53);//S
+	msg6_packet[2] = (0x34);//4
+	msg6_packet[3] = (0x56);//V
+	msg6_packet[4] = (0x4c);//L
+	msg6_packet[5] = (0x31);//1
+		//src_MAC (Switch)
+	msg6_packet[6] = (0xaa);
+	msg6_packet[7] = (0xbb);
+	msg6_packet[8] = (0xcc);
+	msg6_packet[9] = (0x05);
+	msg6_packet[10] = (0x05);
+	msg6_packet[11] = (0x51);//PC
+		//ether_type
+	msg6_packet[12] = (0x08);
+	msg6_packet[13] = (0x00);
+	//IPv4
+	msg6_packet[14] = (0x45);
+	msg6_packet[15] = (0x00);
+	//total_length
+	msg6_packet[16] = (0x00);
+	msg6_packet[17] = (0x1a);//26 bytes
+	//identification
+	msg6_packet[18] = (0x1d);
+	msg6_packet[19] = (0x94);//random
+	//flags
+	msg6_packet[20] = (0x00);
+	//fragment
+	msg6_packet[21] = (0x00);
+	//ttl
+	msg6_packet[22] = (0x01);
+	//protocol
+	msg6_packet[23] = (0x11);
+	//ip_checksum
+	msg6_packet[24] = (0x91);
+	msg6_packet[25] = (0x6e);
+	//src_ip
+	msg6_packet[26] = (0xc0);
+	msg6_packet[27] = (0xa8);
+	msg6_packet[28] = (0xb2);
+	msg6_packet[29] = (0x5c);//random
+		//dst_ip
+	msg6_packet[30] = (0xc0);
+	msg6_packet[31] = (0xa8);
+	msg6_packet[32] = (0xb2);
+	msg6_packet[33] = (0x5a);//random
+		//src_port
+	msg6_packet[34] = (0x04);
+	msg6_packet[35] = (0x15);//random
+	//dst_port
+	msg6_packet[36] = (0x04);
+	msg6_packet[37] = (0x16);//random
+	//udp_length
+	msg6_packet[38] = (0x00);
+	msg6_packet[39] = (0x12);//18 bytes
+	//udp_checksum
+	msg6_packet[40] = (0xaa);
+	msg6_packet[41] = (0xff);//random
 
 	//Append flag
 	msg6_packet[42] = (0x06);//Key est msg 6 flag
-	
+
 	appendData = 43;
 	for (getData = 0; getData < hashLen; getData++)
 	{
 		msg6_packet[appendData] = Sw_challengeHash[getData];
 		appendData++;
 	}//endFOR
-	
+
 	//send packet
 	pcap_sendpacket(Channel204, msg6_packet, KEY_EST_MSG6_LEN);//KDF message 5 packet
 	//listen for messages from ES
@@ -1239,66 +1239,66 @@ void KE_successMsg()
 //---------------------------------------------------------------------------------------
 void KE_fourthMessage()
 {
-	 //Build packet for message 4 and encrypt the payload
-        //dst_MAC (ES4, VL1)
-    msg4_packet[0] = (0x45);//E
-    msg4_packet[1] = (0x53);//S
-    msg4_packet[2] = (0x34);//4
-    msg4_packet[3] = (0x56);//V
-    msg4_packet[4] = (0x4c);//L
-    msg4_packet[5] = (0x31);//1
-        //src_MAC (Switch)
-    msg4_packet[6] = (0xaa);
-    msg4_packet[7] = (0xbb);
-    msg4_packet[8] = (0xcc);
-    msg4_packet[9] = (0x05);
-    msg4_packet[10] = (0x05);
-    msg4_packet[11] = (0x51);//PC
-        //ether_type
-    msg4_packet[12] = (0x08);
-    msg4_packet[13] = (0x00);
-    //IPv4
-    msg4_packet[14] = (0x45);
-    msg4_packet[15] = (0x00);
-    //total_length
-    msg4_packet[16] = (0x00);
-    msg4_packet[17] = (0x1a);//26 bytes
-    //identification
-    msg4_packet[18] = (0x1d);
-    msg4_packet[19] = (0x94);//random
-    //flags
-    msg4_packet[20] = (0x00);
-    //fragment
-    msg4_packet[21] = (0x00);
-    //ttl
-    msg4_packet[22] = (0x01);
-    //protocol
-    msg4_packet[23] = (0x11);
-    //ip_checksum
-    msg4_packet[24] = (0x91);
-    msg4_packet[25] = (0x6e);
-    //src_ip
-    msg4_packet[26] = (0xc0);
-    msg4_packet[27] = (0xa8);
-    msg4_packet[28] = (0xb2);
-    msg4_packet[29] = (0x5c);//random
-        //dst_ip
-    msg4_packet[30] = (0xc0);
-    msg4_packet[31] = (0xa8);
-    msg4_packet[32] = (0xb2);
-    msg4_packet[33] = (0x5a);//random
-        //src_port
-    msg4_packet[34] = (0x04);
-    msg4_packet[35] = (0x15);//random
-    //dst_port
-    msg4_packet[36] = (0x04);
-    msg4_packet[37] = (0x16);//random
-    //udp_length
-    msg4_packet[38] = (0x00);
-    msg4_packet[39] = (0x12);//18 bytes
-    //udp_checksum
-    msg4_packet[40] = (0xaa);
-    msg4_packet[41] = (0xff);//random
+	//Build packet for message 4 and encrypt the payload
+	   //dst_MAC (ES4, VL1)
+	msg4_packet[0] = (0x45);//E
+	msg4_packet[1] = (0x53);//S
+	msg4_packet[2] = (0x34);//4
+	msg4_packet[3] = (0x56);//V
+	msg4_packet[4] = (0x4c);//L
+	msg4_packet[5] = (0x31);//1
+		//src_MAC (Switch)
+	msg4_packet[6] = (0xaa);
+	msg4_packet[7] = (0xbb);
+	msg4_packet[8] = (0xcc);
+	msg4_packet[9] = (0x05);
+	msg4_packet[10] = (0x05);
+	msg4_packet[11] = (0x51);//PC
+		//ether_type
+	msg4_packet[12] = (0x08);
+	msg4_packet[13] = (0x00);
+	//IPv4
+	msg4_packet[14] = (0x45);
+	msg4_packet[15] = (0x00);
+	//total_length
+	msg4_packet[16] = (0x00);
+	msg4_packet[17] = (0x1a);//26 bytes
+	//identification
+	msg4_packet[18] = (0x1d);
+	msg4_packet[19] = (0x94);//random
+	//flags
+	msg4_packet[20] = (0x00);
+	//fragment
+	msg4_packet[21] = (0x00);
+	//ttl
+	msg4_packet[22] = (0x01);
+	//protocol
+	msg4_packet[23] = (0x11);
+	//ip_checksum
+	msg4_packet[24] = (0x91);
+	msg4_packet[25] = (0x6e);
+	//src_ip
+	msg4_packet[26] = (0xc0);
+	msg4_packet[27] = (0xa8);
+	msg4_packet[28] = (0xb2);
+	msg4_packet[29] = (0x5c);//random
+		//dst_ip
+	msg4_packet[30] = (0xc0);
+	msg4_packet[31] = (0xa8);
+	msg4_packet[32] = (0xb2);
+	msg4_packet[33] = (0x5a);//random
+		//src_port
+	msg4_packet[34] = (0x04);
+	msg4_packet[35] = (0x15);//random
+	//dst_port
+	msg4_packet[36] = (0x04);
+	msg4_packet[37] = (0x16);//random
+	//udp_length
+	msg4_packet[38] = (0x00);
+	msg4_packet[39] = (0x12);//18 bytes
+	//udp_checksum
+	msg4_packet[40] = (0xaa);
+	msg4_packet[41] = (0xff);//random
 
 	chaskeyMsgLen = 16;
 	//Generate challenge response
@@ -1308,17 +1308,17 @@ void KE_fourthMessage()
 
 	//Append flag
 	msg4_packet[42] = (0x04);//Key est msg 4 flag
-	
+
 	appendData = 43;
 	for (getData = 0; getData < CHALLENGE_LEN; getData++)
 	{
 		msg4_packet[appendData] = Sw_challenge[getData];
 		appendData++;
 	}//endFOR
-	
+
 	//send packet
 	pcap_sendpacket(Channel204, msg4_packet, KEY_EST_MSG4_LEN);//KDF message 5 packet
-	
+
 	//listen for KE message 5 from ES
 	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 }//end_KE_FOURTH_MESSAGE
@@ -1329,68 +1329,68 @@ void KE_fourthMessage()
 					//1)Switch sends E[masterkey](R[Sw]||I[ES]||F[sw]||Nonce[SW])||R[ES]
 //---------------------------------------------------------------------------------------
 void KE_secondMessage()
-{    
-    //Build packet for message 2 and encrypt the payload
-        //dst_MAC (ES4, VL1)
-    msg2_packet[0] = (0x45);//E
-    msg2_packet[1] = (0x53);//S
-    msg2_packet[2] = (0x34);//4
-    msg2_packet[3] = (0x56);//V
-    msg2_packet[4] = (0x4c);//L
-    msg2_packet[5] = (0x31);//1
-        //src_MAC (Switch)
-    msg2_packet[6] = (0x45);//E
-    msg2_packet[7] = (0x53);//S
-    msg2_packet[8] = (0x31);//1
-    msg2_packet[9] = (0x56);//V
-    msg2_packet[10] = (0x4c);//L
-    msg2_packet[11] = (0x31);//1
-        //ether_type
-    msg2_packet[12] = (0x08);
-    msg2_packet[13] = (0x00);
-    //IPv4
-    msg2_packet[14] = (0x45);
-    msg2_packet[15] = (0x00);
-    //total_length
-    msg2_packet[16] = (0x00);
-    msg2_packet[17] = (0x1a);//26 bytes
-    //identification
-    msg2_packet[18] = (0x1d);
-    msg2_packet[19] = (0x94);//random
-    //flags
-    msg2_packet[20] = (0x00);
-    //fragment
-    msg2_packet[21] = (0x00);
-    //ttl
-    msg2_packet[22] = (0x01);
-    //protocol
-    msg2_packet[23] = (0x11);
-    //ip_checksum
-    msg2_packet[24] = (0x91);
-    msg2_packet[25] = (0x6e);//random
-    //src_ip
-    msg2_packet[26] = (0xc0);
-    msg2_packet[27] = (0xa8);
-    msg2_packet[28] = (0xb2);
-    msg2_packet[29] = (0x5c);//random
-        //dst_ip
-    msg2_packet[30] = (0xc0);
-    msg2_packet[31] = (0xa8);
-    msg2_packet[32] = (0xb2);
-    msg2_packet[33] = (0x5a);//random
-        //src_port
-    msg2_packet[34] = (0x04);
-    msg2_packet[35] = (0x15);//random
+{
+	//Build packet for message 2 and encrypt the payload
+		//dst_MAC (ES4, VL1)
+	msg2_packet[0] = (0x45);//E
+	msg2_packet[1] = (0x53);//S
+	msg2_packet[2] = (0x34);//4
+	msg2_packet[3] = (0x56);//V
+	msg2_packet[4] = (0x4c);//L
+	msg2_packet[5] = (0x31);//1
+		//src_MAC (Switch)
+	msg2_packet[6] = (0x45);//E
+	msg2_packet[7] = (0x53);//S
+	msg2_packet[8] = (0x31);//1
+	msg2_packet[9] = (0x56);//V
+	msg2_packet[10] = (0x4c);//L
+	msg2_packet[11] = (0x31);//1
+		//ether_type
+	msg2_packet[12] = (0x08);
+	msg2_packet[13] = (0x00);
+	//IPv4
+	msg2_packet[14] = (0x45);
+	msg2_packet[15] = (0x00);
+	//total_length
+	msg2_packet[16] = (0x00);
+	msg2_packet[17] = (0x1a);//26 bytes
+	//identification
+	msg2_packet[18] = (0x1d);
+	msg2_packet[19] = (0x94);//random
+	//flags
+	msg2_packet[20] = (0x00);
+	//fragment
+	msg2_packet[21] = (0x00);
+	//ttl
+	msg2_packet[22] = (0x01);
+	//protocol
+	msg2_packet[23] = (0x11);
+	//ip_checksum
+	msg2_packet[24] = (0x91);
+	msg2_packet[25] = (0x6e);//random
+	//src_ip
+	msg2_packet[26] = (0xc0);
+	msg2_packet[27] = (0xa8);
+	msg2_packet[28] = (0xb2);
+	msg2_packet[29] = (0x5c);//random
+		//dst_ip
+	msg2_packet[30] = (0xc0);
+	msg2_packet[31] = (0xa8);
+	msg2_packet[32] = (0xb2);
+	msg2_packet[33] = (0x5a);//random
+		//src_port
+	msg2_packet[34] = (0x04);
+	msg2_packet[35] = (0x15);//random
 		//dst_port
-    msg2_packet[36] = (0x04);
-    msg2_packet[37] = (0x16);//random
+	msg2_packet[36] = (0x04);
+	msg2_packet[37] = (0x16);//random
 		//udp_length
-    msg2_packet[38] = (0x00);
-    msg2_packet[39] = (0x12);//18 bytes
+	msg2_packet[38] = (0x00);
+	msg2_packet[39] = (0x12);//18 bytes
 		//udp_checksum
-    msg2_packet[40] = (0xaa);
-    msg2_packet[41] = (0xff);//random
-	
+	msg2_packet[40] = (0xaa);
+	msg2_packet[41] = (0xff);//random
+
 	//Append flag
 	msg2_packet[42] = (0x02);//Key est msg 2 flag
 
@@ -1430,7 +1430,7 @@ void KE_secondMessage()
 		msg2_packet[appendData] = ES_RandomNum[getData];
 		appendData++;
 	}//endFOR
-			
+
 	//send packet
 	pcap_sendpacket(Channel204, msg2_packet, KEY_EST_MSG2_LEN);//KDF message 1 packet
 	//listen for response
@@ -1454,230 +1454,230 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
 	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
-	
+
 	printf("\n---------------------------------------------------------------------\n");
-    printf("Grabbed packet of length %d\n", header->len);
+	printf("Grabbed packet of length %d\n", header->len);
 	printf("\n---------------------------------------------------------------------\n");
 	printf("\n");
-	
+
 	//Retrieve  flag and call appropriate function 
 	for (getData = OFFSET; getData < FLAG_LEN; getData++)
 	{
-		msgFlag[getData] =  ES_payload[getData];//Fill payload array for decryption
+		msgFlag[getData] = ES_payload[getData];//Fill payload array for decryption
 	}//endFOR
-	
-	switch (msgFlag[0])
-		{
-			case 0x01:
-				printf("\nKey Establishment Message Type 1 recognized\n");
-				//Retrieve message 1 random number
-				printf("\nRandom Number:\n");
-				appendData = 0;
-				for (getData = 1; getData < MSG1_PAYLOAD_LEN + 1; getData++)
-				{
-					ES_RandomNum[appendData] = ES_payload[getData];//Fill payload array for decryption
-					printf("%c", ES_RandomNum[appendData]);
-					appendData++;
-				}//endFOR
-				printf("\n");
-			break;
-			
-			case 0x02:
-			break;
-			
-			case 0x03:
-				printf("\nKey Establishment Message Type 3 recognized\n");
-				//Retrieve message 3 random number
-				printf("\nSwitch Random Number:\n");
-				appendData = 49;
-				for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
-				{
-					RandomNum[getData] = ES_payload[appendData];//Fill payload array for decryption
-					printf("%c", RandomNum[getData]);
-					appendData++;
-				}//endFOR
-				printf("\n");
-				
-				//Compare R(ES) == R(ES)'
-				if ((0 == memcmp((char*)RandomNum, (char*)Sw_RandomNum, RANDOM_NUM_LEN)))
-				{
-					//Retrieve other parameters
-					appendData = 1;
-					//Parse payload for:
-					printf("\nSwitch Identifier:\n");
-					///(1) I(switch) --> switch Identifier
-					for (getData = 0; getData < IDENTIFIER_LEN; getData++)
-					{
-						ES_swID[getData] = ES_payload[appendData];
-						printf("%c", ES_swID[getData]);
-						appendData++;
-					}
-					printf("\n");
-					printf("\nES Keying Material:\n");
-					///(2) F(ES) --> Keying material
-					for (getData = 0; getData < KEYING_MAT_LEN; getData++)
-					{
-						ES_keyMat[getData] = ES_payload[appendData];
-						printf("%c", ES_keyMat[getData]);
-						appendData++;
-					}
-					printf("\n");
-					printf("\nES Nonce:\n");
-					///(3) N(ES) --> Nonce
-					for (getData = 0; getData < NONCE_LEN; getData++)
-					{
-						ES_Nonce[getData] = ES_payload[appendData];
-						printf("%c", ES_Nonce[getData]);
-						appendData++;
-					}
-					
-					printf("\n");
 
-					//Compare Sw(ES) and Sw(ES)'
-					if ((0 == memcmp((char*)ES_swID, (char*)Sw_SWID, IDENTIFIER_LEN)))
-					{
-						printf("\nNo errors...generating session key\n");
-						counter = 5;
-					}
-					else {
-						//otherwise --> close channel
-						printf("\nIdentifier mismatch error!\n");
-						//kdf_failure++;//Increment error count
-						exit(EXIT_FAILURE);
-					}//end_IF_ELSE
-				}//endIF
-				printf("\n");
-			break;
-			
-			case 0x04:
-			break;
-			
-			case 0x05:
-				printf("\nKey Establishment Message Type 5 recognized\n");
-				//Retrieve message 5 challenge response
-				//Retrieve toggle bit;
-				toggleBit[0] = ES_payload[5];
-				printf("\n Current toggle bit:%02x", toggleBit[0]);
-				//Set toggle bit
-				Sw_challengeHash[4] = toggleBit[0];
-							
-				printf("\nES Challenge response:\n");
-				appendData = 0;
-				for (getData = 1; getData < hashLen + 1; getData++)
-				{
-					challengeVal[appendData] = ES_payload[getData];//Fill payload array for decryption
-					printf("%02x", challengeVal[appendData]);
-					appendData++;
-				}//endFOR
-				printf("\n");
-				printf("\nSw Challenge response:\n");
-				for (getData = 0; getData < hashLen; getData++)
-				{
-					printf("%02x", Sw_challengeHash[getData]);
-				}//endFOR
-				printf("\n");
-				
-				//Compare H(Sw) == H(ES)
-				if ((0 == memcmp((char*)challengeVal, (char*)Sw_challengeHash, HASH_LEN)))
-				{
-					printf("\nChallenge successful...Session key stored\n");
-					msgFlag[0] = (0x13);
-				}
-				else{
-					printf("\nChallenge unsuccessful...Session key destroyed\n");
-					printf("\nRestarting key establishment\n");
-					msgFlag[0] = (0x07);
-				}//endIF_ELSE
-			break;
-			
-			case 0x06:
-			break;
-			
-			case 0x07:
-			break;
-			
-			case 0x08:
-			break;
-			
-			case 0x09:
-			break;
-			
-			case 0x10:
-			break;
-			
-			case 0x11:
-			break;
-			
-			case 0x12:
-			break;
-			
-			case 0x13:
-			//Retrieve payload
-			appendData = 0;
-			for (getData = OFFSET + 1; getData < PACKET_PAYLOAD + 1; getData++)
+	switch (msgFlag[0])
+	{
+	case 0x01:
+		printf("\nKey Establishment Message Type 1 recognized\n");
+		//Retrieve message 1 random number
+		printf("\nRandom Number:\n");
+		appendData = 0;
+		for (getData = 1; getData < MSG1_PAYLOAD_LEN + 1; getData++)
+		{
+			ES_RandomNum[appendData] = ES_payload[getData];//Fill payload array for decryption
+			printf("%c", ES_RandomNum[appendData]);
+			appendData++;
+		}//endFOR
+		printf("\n");
+		break;
+
+	case 0x02:
+		break;
+
+	case 0x03:
+		printf("\nKey Establishment Message Type 3 recognized\n");
+		//Retrieve message 3 random number
+		printf("\nSwitch Random Number:\n");
+		appendData = 49;
+		for (getData = 0; getData < RANDOM_NUM_LEN; getData++)
+		{
+			RandomNum[getData] = ES_payload[appendData];//Fill payload array for decryption
+			printf("%c", RandomNum[getData]);
+			appendData++;
+		}//endFOR
+		printf("\n");
+
+		//Compare R(ES) == R(ES)'
+		if ((0 == memcmp((char*)RandomNum, (char*)Sw_RandomNum, RANDOM_NUM_LEN)))
+		{
+			//Retrieve other parameters
+			appendData = 1;
+			//Parse payload for:
+			printf("\nSwitch Identifier:\n");
+			///(1) I(switch) --> switch Identifier
+			for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 			{
-				plaintext[appendData] = ES_payload[getData];//Fill payload array for hash calculation
-			}//endFOR
-			
-			//Retrieve toggle bit
-			incomingToggleBit[0] = ES_payload[447];
-			printf("\n Current toggle bit:%02x", toggleBit[0]);
-			printf("\n Incoming toggle bit:%02x", incomingToggleBit[0]);
-			if (incomingToggleBit[0] != toggleBit[0])
+				ES_swID[getData] = ES_payload[appendData];
+				printf("%c", ES_swID[getData]);
+				appendData++;
+			}
+			printf("\n");
+			printf("\nES Keying Material:\n");
+			///(2) F(ES) --> Keying material
+			for (getData = 0; getData < KEYING_MAT_LEN; getData++)
 			{
-				//update session key pointer
-				printf("\n\New toggle bit...starting key change over");
-				printf("\n\Updating toggle bit...");
-				toggleBit[0] = incomingToggleBit[0];		
-			}	
-			
-			//Retrieve MIC
-			appendData = 0;
-			printf("\n\nIncoming MIC: \n");
-			for (getData = PACKET_PAYLOAD + 1; getData < HASH_LEN; getData++) 
+				ES_keyMat[getData] = ES_payload[appendData];
+				printf("%c", ES_keyMat[getData]);
+				appendData++;
+			}
+			printf("\n");
+			printf("\nES Nonce:\n");
+			///(3) N(ES) --> Nonce
+			for (getData = 0; getData < NONCE_LEN; getData++)
 			{
-				hashValue[appendData] = ES_payload[getData];//Fill hash from incoming message
-				printf("%02x", hashValue[getData]);
-			}//endFOR
-			
-			//MAC generation
-			//Calculate hash and compare to appended hash
+				ES_Nonce[getData] = ES_payload[appendData];
+				printf("%c", ES_Nonce[getData]);
+				appendData++;
+			}
+
+			printf("\n");
+
+			//Compare Sw(ES) and Sw(ES)'
+			if ((0 == memcmp((char*)ES_swID, (char*)Sw_SWID, IDENTIFIER_LEN)))
+			{
+				printf("\nNo errors...generating session key\n");
+				counter = 5;
+			}
+			else {
+				//otherwise --> close channel
+				printf("\nIdentifier mismatch error!\n");
+				//kdf_failure++;//Increment error count
+				exit(EXIT_FAILURE);
+			}//end_IF_ELSE
+		}//endIF
+		printf("\n");
+		break;
+
+	case 0x04:
+		break;
+
+	case 0x05:
+		printf("\nKey Establishment Message Type 5 recognized\n");
+		//Retrieve message 5 challenge response
+		//Retrieve toggle bit;
+		toggleBit[0] = ES_payload[5];
+		printf("\n Current toggle bit:%02x", toggleBit[0]);
+		//Set toggle bit
+		Sw_challengeHash[4] = toggleBit[0];
+
+		printf("\nES Challenge response:\n");
+		appendData = 0;
+		for (getData = 1; getData < hashLen + 1; getData++)
+		{
+			challengeVal[appendData] = ES_payload[getData];//Fill payload array for decryption
+			printf("%02x", challengeVal[appendData]);
+			appendData++;
+		}//endFOR
+		printf("\n");
+		printf("\nSw Challenge response:\n");
+		for (getData = 0; getData < hashLen; getData++)
+		{
+			printf("%02x", Sw_challengeHash[getData]);
+		}//endFOR
+		printf("\n");
+
+		//Compare H(Sw) == H(ES)
+		if ((0 == memcmp((char*)challengeVal, (char*)Sw_challengeHash, HASH_LEN)))
+		{
+			printf("\nChallenge successful...Session key stored\n");
+			msgFlag[0] = (0x13);
+		}
+		else {
+			printf("\nChallenge unsuccessful...Session key destroyed\n");
+			printf("\nRestarting key establishment\n");
+			msgFlag[0] = (0x07);
+		}//endIF_ELSE
+		break;
+
+	case 0x06:
+		break;
+
+	case 0x07:
+		break;
+
+	case 0x08:
+		break;
+
+	case 0x09:
+		break;
+
+	case 0x10:
+		break;
+
+	case 0x11:
+		break;
+
+	case 0x12:
+		break;
+
+	case 0x13:
+		//Retrieve payload
+		appendData = 0;
+		for (getData = OFFSET + 1; getData < PACKET_PAYLOAD + 1; getData++)
+		{
+			plaintext[appendData] = ES_payload[getData];//Fill payload array for hash calculation
+		}//endFOR
+
+		//Retrieve toggle bit
+		incomingToggleBit[0] = ES_payload[447];
+		printf("\n Current toggle bit:%02x", toggleBit[0]);
+		printf("\n Incoming toggle bit:%02x", incomingToggleBit[0]);
+		if (incomingToggleBit[0] != toggleBit[0])
+		{
+			//update session key pointer
+			printf("\nNew toggle bit...starting key change over\n");
+			printf("\nUpdating toggle bit...\n");
+			toggleBit[0] = incomingToggleBit[0];
+		}//endIF	
+
+		//Retrieve MIC
+		appendData = 0;
+		printf("\n\nIncoming MIC: \n");
+		for (getData = PACKET_PAYLOAD + 1; getData < HASH_LEN; getData++)
+		{
+			hashValue[appendData] = ES_payload[getData];//Fill hash from incoming message
+			printf("%02x", hashValue[getData]);
+		}//endFOR
+
+		//MAC generation
+		//Calculate hash and compare to appended hash
+		chaskeyMsgLen = 486;
+		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
+		counter = 0;
+		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		hash[4] = toggleBit[0];//Insert toggle bit
+		//memcpy(hash, newDigest, HASH_LEN);//Copy hash to message digest array	
+		//Compare Hashes
+		if ((0 == memcmp((char*)hashValue, (char*)hash, HASH_LEN)))
+		{
+			printf("\n\n>>>>hashes match....forwarding packing to outbound port\n\n");
+			printf("\n\nCalculating new MIC\n");
 			chaskeyMsgLen = 486;
 			subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
 			counter = 0;
-			chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+			chaskey(hash, plaintext, EsSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 			hash[4] = toggleBit[0];//Insert toggle bit
-			//memcpy(hash, newDigest, HASH_LEN);//Copy hash to message digest array	
-			//Compare Hashes
-			if ((0 == memcmp((char*)hashValue, (char*)hash, HASH_LEN)))
+			//Append new MIC
+			appendData = 444;
+			for (getData = 0; getData < HASH_LEN; getData++)
 			{
-				printf("\n\n>>>>hashes match....forwarding packing to outbound port\n\n");
-				printf("\n\nCalculating new MIC\n");
-				chaskeyMsgLen = 486;
-				subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
-				counter = 0;
-				chaskey(hash, plaintext, EsSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
-				hash[4] = toggleBit[0];//Insert toggle bit
-				//Append new MIC
-				appendData = 444;
-				for (getData = 0; getData < HASH_LEN; getData++) 
-				{
-					plaintext[appendData] = hash[getData];//Fill hash from incoming message
-					//Send Message
-				}//endFOR
-			}
-			else 
-			{
-				printf("\n\n>>>>hashes do not match...dropping packet\n\n");
-				printf("\n---------------------------------------------------------------------\n");
-				//increment error counter
-				//countinue listening until error threshold*************************************************************
-			}//endIF
-			break;
-			
-			default: printf("\nUnrecognized message\n");
-			break;
-		}//endSWITCH
+				plaintext[appendData] = hash[getData];//Fill hash from incoming message
+				//Send Message
+			}//endFOR
+		}//endIF
+		else
+		{
+			printf("\n\n>>>>hashes do not match...dropping packet\n\n");
+			printf("\n---------------------------------------------------------------------\n");
+			//increment error counter
+			//countinue listening until error threshold*************************************************************
+		}//endIF_ELSE
+		break;
+
+	default: printf("\nUnrecognized message\n");
+		break;
+	}//endSWITCH
 }//end_HANDLE_MSG
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1688,70 +1688,70 @@ void main()
 {
 	///call functions to start communication
 	openInterfaces();//Open channels for sending and receiving
-	
-    //Start sniffing incoming packets on all ports...//maybe just 1 for now //need to thread/fork this sp the sniff simultaneosly
+
+	//Start sniffing incoming packets on all ports...//maybe just 1 for now //need to thread/fork this sp the sniff simultaneosly
 	//pcap_loop(Channel201, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 4
 	//pcap_loop(Channel202, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 0
 	//pcap_loop(Channel203, PACKET_COUNT, packetHandler, NULL);//Start packet capture on port 1
-        pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
-	
-	do{
+	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+
+	do {
 		openInterfaces();//Keep channels open
-		if(msgFlag[0] == 0x01)
+		if (msgFlag[0] == 0x01)
 		{
 			KE_secondMessage();//Create and send message 2
 		}
-		if(msgFlag[0] == 0x02)
+		if (msgFlag[0] == 0x02)
 		{
 			//KE_thirdMessage();//Create and send message 3
 		}
-		if(msgFlag[0] == 0x03)
+		if (msgFlag[0] == 0x03)
 		{
 			//generate session keys
 			sessionKeys();
 			KE_fourthMessage();//Create and send message 4
 		}
-		if(msgFlag[0] == 0x04)
+		if (msgFlag[0] == 0x04)
 		{
 			//KE_fifthMessage();//Create and send message 5
 		}
-		if(msgFlag[0] == 0x05)
+		if (msgFlag[0] == 0x05)
 		{
 			//Send either message 6 or 7
 		}
-		if(msgFlag[0] == 0x06)
+		if (msgFlag[0] == 0x06)
 		{
 			//Start using key
 		}
-		if(msgFlag[0] == 0x07)
+		if (msgFlag[0] == 0x07)
 		{
 			//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
 		}
-		if(msgFlag[0] == 0x08)
+		if (msgFlag[0] == 0x08)
 		{
 			//Check if nextSessionKey pointer is NULL
 		}
-		if(msgFlag[0] == 0x09)
+		if (msgFlag[0] == 0x09)
 		{
 			//Update currentSessionKey pointer and togglebit
 		}
-		if(msgFlag[0] == 0x10)
+		if (msgFlag[0] == 0x10)
 		{
 			//Set currentSessionKey pointer to NULL to revoke keys
 			//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
 		}
-		if(msgFlag[0] == 0x11)
+		if (msgFlag[0] == 0x11)
 		{
 			//Increment Key Est. error count and check threshold
 		}
-		if(msgFlag[0] == 0x12)
+		if (msgFlag[0] == 0x12)
 		{
 			//Increment MIC verification error count and check threshold
 		}
-		if(msgFlag[0] == 0x13)
+		if (msgFlag[0] == 0x13)
 		{
 			//Regular key usage
-			regularUsage()
+			regularUsage();
 		}
-	} while(0); //endDO_WHILE
+	} while (0); //endDO_WHILE
 }//end_MAIN
