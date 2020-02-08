@@ -1385,13 +1385,19 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\nKey Establishment Message Type 5 recognized\n");
 			//Retrieve message 5 challenge response
 			//Retrieve toggle bit;
-			printf("\nChallenge response:\n");
+			printf("\nES Challenge response:\n");
 			appendData = 0;
-			for (getData = 1; getData < MSG1_PAYLOAD_LEN + 1; getData++)
+			for (getData = 1; getData < hashLen + 1; getData++)
 			{
 				challengeVal[appendData] = ES_payload[getData];//Fill payload array for decryption
-				printf("%c", challengeVal[appendData]);
+				printf("%02x", challengeVal[appendData]);
 				appendData++;
+			}//endFOR
+			printf("\n");
+			printf("\nSw Challenge response:\n");
+			for (getData = 0; getData < hashLen; getData++)
+			{
+				printf("%02x", challengeVal[appendData]);
 			}//endFOR
 			printf("\n");
 			//Compare H(Sw) == H(ES)
