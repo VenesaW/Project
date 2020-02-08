@@ -319,10 +319,10 @@ unsigned char w[80];
 unsigned char z[] = " ";//bit string output of Chaskey from which to take key
 
 ///Regular key usage
-unsigned char hashCalculated[HASH_LEN];//Hash calculated by the switch
-unsigned char hashValue[HASH_LEN];//Packet hash value
-unsigned char packet[PACKET_SIZE];//Array to hold regular AFDX message with hash
-unsigned char plaintext[PACKET_PAYLOAD];//Plaintext message for hashing
+unsigned char hashCalculated[] = "";//Hash calculated by the switch
+unsigned char hashValue[] = "";//Packet hash value
+unsigned char packet[] = "";//Array to hold regular AFDX message with hash
+unsigned char plaintext[] = "";//Plaintext message for hashing
 
 unsigned char *hashedPacket;//Pointer to packet segment for hashing
 unsigned char *oldDigest;//Pointer to packet message digest
