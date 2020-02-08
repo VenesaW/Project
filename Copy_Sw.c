@@ -218,7 +218,7 @@ unsigned int chaskeyMsgLen;
 unsigned int hashLen = 8;
 unsigned char TSNMICinput[] = "";//TSNMIC concatenated payload
 unsigned char msgFlag[] = "";//Array to hold message flag
-unsigned char toggleBit [] = "";//Toggle bit for key management;
+unsigned char toggleBit[] = "";//Toggle bit for key management;
 
 ///hash codes and encrypted packets
 unsigned char hash[HASH_LEN];//memory area for chaskey output hash; should be at most 128-bits (32 characters; 16 bytes)
@@ -1386,6 +1386,11 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\nKey Establishment Message Type 5 recognized\n");
 			//Retrieve message 5 challenge response
 			//Retrieve toggle bit;
+			toggleBit[0] = ES_payload[6];
+			printf("\n Current toggle bit:%02x", toggleBit[0]);
+			//Set toggle bit
+			Sw_challengeHash[5] = toggleBit[0];
+						
 			printf("\nES Challenge response:\n");
 			appendData = 0;
 			for (getData = 1; getData < hashLen + 1; getData++)
@@ -1401,6 +1406,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				printf("%02x", Sw_challengeHash[getData]);
 			}//endFOR
 			printf("\n");
+			
 			//Compare H(Sw) == H(ES)
 			if ((0 == memcmp((char*)challengeVal, (char*)Sw_challengeHash, HASH_LEN)))
 			{
