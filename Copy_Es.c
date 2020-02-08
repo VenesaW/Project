@@ -21,7 +21,7 @@
 //---------------------------------------------------------------------------------------
 //                FUNCTION FORWARD DECLARATIONS
 //---------------------------------------------------------------------------------------
-void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_char *in_packet);
+void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_char *in_packet);
 //---------------------------------------------------------------------------------------
 //                STATIC DECLARATIONS
 //---------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const 
 #define INTERFACE_MODE 1 //Put interface in promiscuous mode (1) or non-promiscuous mode (0)
 #define PACKET_DATA 486 //Example AFDX message with 486 bytes of data
 #define PACKET_PAYLOAD 444 //Example AFDX message with 486 bytes of data - 444 bytes form the payload
-#define PACKET_SIZE 502 //Example AFDX message with 486 bytes of data and a 32 byte message digest
+#define PACKET_SIZE 495 //Example AFDX message with 486 bytes of data and a 16 byte message digest
 #define PCAP_NETMASK_UNKNOWN 0xffffffff//default netmask
 #define READ_TIMEOUT 1000 //The packet buffer timeout in milliseconds ->0 means no timeout (slows down the code execution)
 #define SIZE_ETHERNET 14 //Ethernet headers are always exactly 14 bytes
@@ -47,12 +47,13 @@ void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const 
 #define KEY_EST_MSG2_LEN 115 //Length of KEY EST MSG 2 packet
 #define KEY_EST_MSG3_LEN 107 //Length of KEY EST MSG 3 packet
 #define KEY_EST_MSG4_LEN 59 //Length of KEY EST MSG 4 packet
-#define KEY_EST_MSG5_LEN 59 //Length of KEY EST MSG 5 packet
-#define KEY_EST_MSG6_LEN 59 //Length of KEY EST MSG 6 packet
-#define KEY_EST_MSG7_LEN 59 //Length of KEY EST MSG 7 packet
+#define KEY_EST_MSG5_LEN 51 //Length of KEY EST MSG 5 packet
+#define KEY_EST_MSG6_LEN 51 //Length of KEY EST MSG 6 packet
+#define KEY_EST_MSG7_LEN 51 //Length of KEY EST MSG 7 packet
 #define KEY_EST_MSG8_LEN 44 //Length of KEY EST MSG 8 packet
 #define KEY_EST_MSG9_LEN 44 //Length of KEY EST MSG 9 packet
 #define KEY_EST_MSG10_LEN 75 //Length of KEY EST MSG 10 packet
+#define REG_MSG13_LEN 495 //Length of MSG 13 packet
 #define NONCE_LEN 16 //16 Byte random number (Nonce) for key establishment
 #define RANDOM_NUM_LEN 16 //16 Byte random number (Nonce) for key establishment
 #define KEYING_MAT_LEN 16 //16 Byte keying material for key establishment
@@ -79,6 +80,7 @@ void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const 
 #define CHAS_SUBSTRING 2 //Key length of CHASKEY subkey used in key transformation
 #define HASH_LEN 8 //Size of hash is 8 bytes (16 characters)
 #define KEY_LEN 16 //Key length of 128 bit secret key (32 characters)
+#define KEYING_MATERIAL_LEN 32 //Concatenation of keying materials (FA||FB)
 
 //Thresholds
 #define KEY_UPDATE_MAX 10 //Ensure next session key is available at this point
@@ -178,7 +180,7 @@ struct ipHeader {
 	unsigned char ip_protocol;//Internet Protocol upper level protocol - TCP/UDP
 	unsigned short ip_checksum;//Internet Protocol header checksum
 	unsigned int ip_srcaddr;//Internet Protocol source address
-	unsigned int ip_dstaddr;//Internet Protocol source addres
+	unsigned int ip_dstaddr;//Internet Protocol source address
 };
 //UDP header parameters for all messages
 struct udpheader {
@@ -195,15 +197,19 @@ struct udpheader {
 ///Master Key paramaters
 char* ESMaster_Key = "AA112233445566778899AABBCCDDEEFF";//pointer to master key (encryption and decryption) as a character stream
 ///Session Key paramaters
-unsigned int ESSession_Key[KEY_LEN] = { 0x833D3433, 0x009F389F, 0x2398E64F, 0x417ACF39 };//master key as hex
+unsigned int ESSession_Key[KEY_LEN] = { 0x833D3433, 0x009F389F, 0x2398E64F, 0x417ACF39 };//master key as hex (ES to Switch)
+unsigned int SwSession_Key[KEY_LEN] = { 0x3433833D, 0x389F009F, 0xE64F2398, 0xCF39417A };//master key as hex (Switch ES)
 unsigned int next_ESSession_Key;
-unsigned char sessionKey[33] = "833D3433009F389F2398E64F417ACF39";//master key as hex
+unsigned char sessionKey[32] = "833D3433009F389F2398E64F417ACF39";//master key as hex
+unsigned char Sw_challenge[] = "FFEEDDAAFFEEDDAA";//Challenge response for Key Establishment message 5
 unsigned int chaskeySubkey1[KEY_LEN];//subkey1
 unsigned int chaskeySubkey2[KEY_LEN];//subkey2
 unsigned int chaskeyMsgLen;
 unsigned int hashLen = 8;
 unsigned char TSNMICinput[] = "";//TSNMIC concatenated payload
 unsigned char msgFlag[] = "";//Array to hold message flag
+unsigned char toggleBit[] = "";//Toggle bit for key management;
+unsigned char incomingToggleBit[] = "";//Monitor toggle bit for key management;
 
 ///hash codes and encrypted packets
 unsigned char hash[HASH_LEN];//memory area for chaskey output hash; should be at most 128-bits (32 characters; 16 bytes)
@@ -276,14 +282,16 @@ double Lh = 64;//bit length of the output of the hash//Chaskey outputs a 64 bit 
 
 int Lc = 32;//bit-length of the binary encoding of the counter c//encoded as a 32-bit, big-endian bit string
 int c;//counter
+int zLEN = 0;
 
-char b[32] = " ";//128 bit key (32 characters) to be extracted from output
-char p[8] = "HMI00001";//Label
-char s[32];//concatenation of keying materials (FA||FB)
-char salt[20] = "AA112233445566778899";//*****************************************************************************
-char u[20] = "AA112233445566778899";//auxilary value
-char h[] = " ";
-char z[] = " ";//bit string output of Chaskey from which to take key
+unsigned char b[32] = " ";//128 bit key (32 characters) to be extracted from output
+unsigned char p[8] = "HMI00001";//Label
+unsigned char s[32];//concatenation of keying materials (FA||FB)
+unsigned char salt[20] = "445FF2333EEDAAA75BCC";//salt
+unsigned char u[20] = "667788997E34FAC236E4";//auxilary value
+unsigned char h[80] = " ";
+unsigned char w[80];
+unsigned char z[] = " ";//bit string output of Chaskey from which to take key
 
 ///Regular key usage
 unsigned char hashCalculated[HASH_LEN];//Hash calculated by the switch
@@ -293,7 +301,6 @@ unsigned char plaintext[PACKET_PAYLOAD];//Plaintext message for hashing
 
 unsigned char *hashedPacket;//Pointer to packet segment for hashing
 unsigned char *oldDigest;//Pointer to packet message digest
-unsigned char *newDigest;//Pointer to recalculated message digest
 
 //unsigned int BAG = 2000;//The BAG value for the ES
 
@@ -306,7 +313,6 @@ int key_usage_threshold = 0;
 int key_change_over_threshold = 0;
 int kdf_failure = 0;
 int mac_mismatch = 0;
-int toggleBit;
 
 ///For loops
 int appendData;//Used in for loop for parsing packet parameters
@@ -315,6 +321,9 @@ int checkData = 0;
 
 ///Temporary array
 unsigned char RandomNum[] = "";
+unsigned char challengeVal[] = "";
+unsigned char integrityVal[] = "";
+unsigned char newDigest[] = "";
 //---------------------------------------------------------------------------------------
 //                AES FUNCTIONS
 //Author: kokke
@@ -972,19 +981,22 @@ void openInterfaces()
 
 	pcap_if_t *iterate_Interfaces;//Interates through list of available interfaces
 	//Print the list of devices
-	printf("\nlisting interfaces\n");
+	//printf("\nlisting interfaces\n");
 	for (iterate_Interfaces = all_Interfaces; iterate_Interfaces; iterate_Interfaces = iterate_Interfaces->next)
 	{
-		printf("%d. %s", ++list_interfaces, iterate_Interfaces->name);
+		//printf("%d. %s", ++list_interfaces, iterate_Interfaces->name);
 		if (iterate_Interfaces->description)
-			printf(" (%s)\n", iterate_Interfaces->description);
-		else
-			printf(" (Sorry, No description available for this device)\n");
+		{
+			//printf(" (%s)\n", iterate_Interfaces->description);
+		}
+		else {
+			//printf(" (Sorry, No description available for this device)\n");
+		}
 	}//endFOR
 
 
 	Interface = getInterface(all_Interfaces);//Get Ethernet interface for Windows PC
-	printf("selected: %s(%s)\n", select_Interface->name, select_Interface->description);
+	//printf("selected: %s(%s)\n", select_Interface->name, select_Interface->description);
 	outChannel = pcap_open_live(Interface, SNAP_LEN, INTERFACE_MODE, READ_TIMEOUT, errorBuffer);//OpenChannel on sender interface
 	pcap_setdirection(outChannel, PCAP_D_IN);//Sniff incoming traffic
 	pcap_compile(outChannel, &compiledCode, "dst port 1046", 1, PCAP_NETMASK_UNKNOWN);//Compile the filter expression
@@ -1004,30 +1016,7 @@ void openInterfaces()
 //---------------------------------------------------------------------------------------
 void sessionKeys()
 {
-	/*
-		Set d = ceil(Lb / Lh)
-		If d >= (2Lc), then halt and output invalid
-		Set z = empty string
-		For c = 1 to d :
-			Set z = z || h(s || c || p || t || [u])
-			Set b = the leftmost L_b bits of z
-	*/
-	//concatenate the keying materials to create s
-	appendData = 0;
-	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
-	{
-		s[appendData] = switch_keyMat[getData];
-		appendData++;
-	}
-	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
-	{
-		s[appendData] = ES_keyMat[getData];
-		appendData++;
-	}
-
-
 	d = ceil(Lb / Lh);
-	//printf("\nd is: %f\n", d);
 
 	if (d >= (2 * Lc))
 	{
@@ -1035,61 +1024,307 @@ void sessionKeys()
 		exit(EXIT_FAILURE);
 	} //endIF
 
-	for (c = 1; c <= d; c++)
+	//Concatenation of keying materials (FA||FB)
+	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
 	{
-		//concatenate input strings: s; p; salt; u;
-		appendData = 0;
-		///(1)s
-		for (getData = 0; getData < 32; getData++)
-		{
-			h[appendData] = s[getData];
-			appendData++;
-		}//endFOR
-		///(2)c
-		h[appendData] = c;
-		appendData++;
+		s[c] = ES_keyMat[c];
+	}//FOR
+	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
+	{
+		s[c + 16] = switch_keyMat[c];
+	}//FOR
 
-		///(3)p
-		for (getData = 0; getData < 8; getData++)
-		{
-			h[appendData] = p[getData];
-			appendData++;
-		}//endFOR
+	memcpy(h, s, 32);
+	memcpy(h + 32, p, 8);
+	memcpy(h + 40, salt, 20);
+	memcpy(h + 60, u, 20);
 
-		///(4)t
-		for (getData = 0; getData < 20; getData++)
-		{
-			h[appendData] = salt[getData];
-			appendData++;
-		}//endFOR
+	memcpy(w, p, 8);
+	memcpy(w + 8, s, 32);
+	memcpy(w + 40, u, 20);
+	memcpy(w + 60, salt, 20);
 
-		///(5)u
-		for (getData = 0; getData < 20; getData++)
-		{
-			h[appendData] = u[getData];
-			appendData++;
-		}//endFOR
-
-		chaskeyMsgLen = sizeof(h);
-
-		//call Chaskey
-		chaskey(hash, h, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
-
-		//create z
-		for (appendData = 0; appendData < HASH_LEN; appendData++)
-		{
-			z[appendData] = hash[appendData];
-		}//endFOR
-	}//endFOR
+	chaskeyMsgLen = 80;
 
 	printf("\nSession Key:\n");
-	for (appendData = 0; appendData < 32; appendData++)
+	for (c = 1; c <= d; c++)
 	{
-		b[appendData] = z[appendData];
-		printf("%c", b[appendData]);
-	}//endFOR
+		if (c == 1)
+		{
+			chaskey(hash, h, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+			memcpy(z, hash, 8);
+		}
+		if (c >= 2)
+		{
+			chaskey(hash, w, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+			memcpy(z + 8, hash, 8);
+		}
+	}//FOR
+
+	for (getData = 0; getData < KEYING_MAT_LEN; getData++)
+	{
+		printf("%02x", z[getData]);
+	}
+
 	printf("\n");
 }//endSESSION_KEYS
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
+//                GENERATING REGULAR HASHED MESSAGES
+					//1)Generate message
+					//2)Calculate and append hash
+					//3)Send message
+					//4)Increment key usage count
+//---------------------------------------------------------------------------------------
+void regularUsage()
+{
+	//Generate packet
+	//Build AFDX message
+		//dstMAC (ES1, VL1)
+	packet[0] = (0x45);//E
+	packet[1] = (0x53);//S
+	packet[2] = (0x31);//1
+	packet[3] = (0x56);//V
+	packet[4] = (0x4c);//L
+	packet[5] = (0x31);//1
+		//src_MAC (ES4, VL1)
+	packet[6] = (0x45);//E
+	packet[7] = (0x53);//S
+	packet[8] = (0x34);//4
+	packet[9] = (0x56);//V
+	packet[10] = (0x4c);//L
+	packet[11] = (0x31);//1
+		//ether_type
+	packet[12] = (0x08);
+	packet[13] = (0x00);
+	//IPv4
+	packet[14] = (0x45);
+	packet[15] = (0x00);
+	//total_length
+	packet[16] = (0x00);
+	packet[17] = (0x1a);
+	//identification
+	packet[18] = (0x1d);
+	packet[19] = (0x94);
+	//flags
+	packet[20] = (0x00);
+	//fragment
+	packet[21] = (0x00);
+	//ttl
+	packet[22] = (0x01);
+	//protocol
+	packet[23] = (0x11);
+	//ip_checksum
+	packet[24] = (0x91);
+	packet[25] = (0x6e);
+	//src_ip
+	packet[26] = (0xc0);
+	packet[27] = (0xa8);
+	packet[28] = (0xb2);
+	packet[29] = (0x5a);//Pi//90
+		//dst_ip
+	packet[30] = (0xc0);
+	packet[31] = (0xa8);
+	packet[32] = (0xb2);
+	packet[33] = (0x5c);//PC//92
+		//src_port
+	packet[34] = (0x04);
+	packet[35] = (0x16);
+	//dst_port
+	packet[36] = (0x04);
+	packet[37] = (0x15);
+	//udp_length
+	packet[38] = (0x01);
+	packet[39] = (0x07);
+	//udp_checksum
+	packet[40] = (0x00);
+	packet[41] = (0x00);
+
+	//Append flag
+	packet[42] = (0x13);//Message 13 flag
+
+	getData = 0;
+	for (appendData = 43; appendData < PACKET_DATA; appendData++)
+	{
+		packet[appendData] = hex_digits[(rand() % 256)];//***Generate same payload for each packet
+		plaintext[getData] = packet[appendData];
+		getData++;
+	}//endFOR
+	//printf("\nPacket built\n");
+
+	counter = 0;
+	chaskeyMsgLen = 444;
+	subkeys(chaskeySubkey1, chaskeySubkey2, ESSession_Key);//call to key schedule function
+	//MAC generation
+	chaskey(hash, plaintext, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+
+	key_usage_threshold++;
+	key_change_over_threshold++;
+	switch (keyCheck)
+	{
+		case 0:
+			if (key_usage_threshold >= KEY_UPDATE_MAX)
+			{
+				if (next_ESSession_Key == NULL)
+				{
+					//generate new key*******************************************************************
+					printf("\nPreparing next session key\n");
+				}
+
+				else {
+					printf("\nNext session key available\n");
+				}
+				keyCheck = 1;//set to 1 now that the key update threshold has been met
+			}//endIF
+			break;
+
+		case 1:
+			if (key_change_over_threshold >= KEY_CHANGE_OVER_MAX)
+			{
+				//update toggle bit
+				if (toggleBit[0] == (0x01))
+				{
+					toggleBit[0] = (0x00);
+				}
+				else
+				{
+					toggleBit[0] = (0x01);
+				}
+
+				//update key pointer
+
+				printf("\nKey change over successful\n");
+				keyCheck = 0;//set to 0 now that the key change-over threshold has been met
+			}//endIF
+			break;
+	}//endSWITCH
+
+	//Append and print MAC to end of packet
+	appendData = 487;
+	printf("\n\nMIC:\n");
+	for (int getData = 0; getData < HASH_LEN; getData++)
+	{
+		packet[appendData] = hash[getData];//Append digest
+		appendData++;
+		printf("%02x", hash[getData]);
+	}//endFOR
+
+	if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
+	{
+		toggleBit[0] = (0x01);//set to 1
+	}
+
+	//Insert toggle bit
+	packet[490] = toggleBit[0];
+
+	
+	//sleep(2);//BAG?
+
+	//Send Packet
+	pcap_sendpacket(outChannel, packet, REG_MSG13_LEN);//Packet is 486 bytes (based on example AFDX pcap) + 32 bytes of hash
+	printf("\n\npacket sent\n");
+
+	///Listen for incoming then loop back
+	pcap_loop(outChannel, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+
+	pcap_close(outChannel);//close channel on which packets are sent
+}////end_REGULAR_USAGE
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
+//                FIFTH KDF MESSAGE TO Switch
+				//1) The ES sends the hash of the challenge
+//---------------------------------------------------------------------------------------
+void KE_fifthMessage()
+{
+	//Generate packet
+	//Build KDF message 5
+		//dstMAC (ES1, VL1)
+	msg5_packet[0] = (0x45);//E
+	msg5_packet[1] = (0x53);//S
+	msg5_packet[2] = (0x31);//1
+	msg5_packet[3] = (0x56);//V
+	msg5_packet[4] = (0x4c);//L
+	msg5_packet[5] = (0x31);//1
+	//src_MAC (ES4, VL1)
+	msg5_packet[6] = (0x45);//E
+	msg5_packet[7] = (0x53);//S
+	msg5_packet[8] = (0x34);//4
+	msg5_packet[9] = (0x56);//V
+	msg5_packet[10] = (0x4c);//L
+	msg5_packet[11] = (0x31);//1
+		//ether_type
+	msg5_packet[12] = (0x08);
+	msg5_packet[13] = (0x00);
+	//IPv4
+	msg5_packet[14] = (0x45);
+	msg5_packet[15] = (0x00);
+	//total_length
+	msg5_packet[16] = (0x00);
+	msg5_packet[17] = (0x1a);
+	//identification
+	msg5_packet[18] = (0x1d);
+	msg5_packet[19] = (0x94);
+	//flags
+	msg5_packet[20] = (0x00);
+	//fragment
+	msg5_packet[21] = (0x00);
+	//ttl
+	msg5_packet[22] = (0x01);
+	//protocol
+	msg5_packet[23] = (0x11);
+	//ip_checksum
+	msg5_packet[24] = (0x91);
+	msg5_packet[25] = (0x6e);
+	//src_ip
+	msg5_packet[26] = (0xc0);
+	msg5_packet[27] = (0xa8);
+	msg5_packet[28] = (0xb2);
+	msg5_packet[29] = (0x5a);//Pi//90
+		//dst_ip
+	msg5_packet[30] = (0xc0);
+	msg5_packet[31] = (0xa8);
+	msg5_packet[32] = (0xb2);
+	msg5_packet[33] = (0x5c);//PC//92
+		//src_port
+	msg5_packet[34] = (0x04);
+	msg5_packet[35] = (0x16);
+	//dst_port
+	msg5_packet[36] = (0x04);
+	msg5_packet[37] = (0x15);
+	//udp_length
+	msg5_packet[38] = (0x01);
+	msg5_packet[39] = (0x07);
+	//udp_checksum
+	msg5_packet[40] = (0x00);
+	msg5_packet[41] = (0x00);
+
+	//Append flag
+	msg5_packet[42] = (0x05);//Key est msg 5 flag
+
+	chaskeyMsgLen = 16;
+	counter = 5;
+	chaskey(hash, challengeVal, ESSession_Key, chaskeySubkey1, chaskeySubkey2);
+	memcpy(ES_challengeResponse, hash, HASH_LEN);
+
+	appendData = 43;
+	for (getData = 0; getData < HASH_LEN; getData++)
+	{
+		msg5_packet[appendData] = hash[getData];
+		appendData++;
+	}//endFOR
+
+	//Set toggle bit
+	toggleBit[0] = (0x01);//Set initial toggle bit
+	ES_challengeResponse[4] = toggleBit[0];//Insert initial toggle bit
+	msg5_packet[47] = toggleBit[0];//Insert initial toggle bit
+
+
+	//send packet
+	pcap_sendpacket(outChannel, msg5_packet, KEY_EST_MSG5_LEN);//KDF message 5 packet
+	pcap_loop(outChannel, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+}//end_KE_FIFTH_MESSAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //------------------------------------------------------------------------------------------------
@@ -1196,6 +1431,7 @@ void KE_thirdMessage()
 
 	//send packet
 	pcap_sendpacket(outChannel, msg3_packet, KEY_EST_MSG3_LEN);//KDF message 3 packet
+	pcap_loop(outChannel, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2#
 }//END_KE_THIRD_MESSAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1287,7 +1523,7 @@ void KE_firstMessage()
 //---------------------------------------------------------------------------------------
 //                HANDLING KEY DERIVATION MESSAGES FROM Switch
 //---------------------------------------------------------------------------------------
-void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_char *in_packet)
+void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_char *in_packet)
 {
 	struct ethernetHeader *ethdr = NULL;//Initialize struct
 	struct ipheader *v4hdr = NULL;//Initialize struct
@@ -1398,15 +1634,50 @@ void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const 
 		break;
 
 	case 0x04:
+		printf("\nKey Establishment Message Type 4 recognized\n");
+		//Retrieve message 4 Challenge
+		printf("\nSwitch Challenge:\n");
+		appendData = 1;
+		for (getData = 0; getData < CHALLENGE_LEN; getData++)
+		{
+			challengeVal[getData] = switch_payload[appendData];//Fill payload array for decryption
+			printf("%c", challengeVal[getData]);
+			appendData++;
+		}//endFOR
+		printf("\n");
 		break;
 
 	case 0x05:
 		break;
 
 	case 0x06:
+		printf("\nKey Establishment Message Type 6 recognized\n");
+		printf("\nChallenge successful...verifying Integrity value\n");
+		//Retrieve integrity value
+		appendData = 0;
+		for (getData = 1; getData < hashLen + 1; getData++)
+		{
+			integrityVal[appendData] = switch_payload[getData];//Fill payload array for decryption
+			appendData++;
+		}//endFOR
+		if ((0 == memcmp((char*)integrityVal, (char*)ES_challengeResponse, HASH_LEN)))
+		{
+			printf("\nVerification successful...session key stored\n");
+			printf("\nStarting communication on link...\n");
+			msgFlag[0] = (0x13);
+		}
+		else {
+			printf("\nChallenge unsuccessful...Session key destroyed\n");
+			printf("\nRestarting key establishment\n");
+			msgFlag[0] = (0x07);
+		}//endIF_ELSE
+		printf("\n");
+		//Start using key
 		break;
 
 	case 0x07:
+		printf("\nKey Establishment Message Type 7 recognized\n");
+		//Restart key est
 		break;
 
 	case 0x08:
@@ -1424,6 +1695,40 @@ void handleKEMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const 
 	case 0x12:
 		break;
 
+	case 0x13:
+		//Retrieve MIC
+		//Retrieve payload
+		appendData = 0;
+		for (getData = OFFSET + 1; getData < PACKET_PAYLOAD + 1; getData++)
+		{
+			plaintext[appendData] = switch_payload[getData];//Fill payload array for hash calculation
+		}//endFOR
+
+		//Retrieve toggle bit
+		incomingToggleBit[0] = switch_payload[447];
+		//Retrieve MIC
+		appendData = 0;
+		printf("\n\nIncoming MIC: \n");
+		for (getData = PACKET_PAYLOAD + 1; getData < HASH_LEN; getData++)
+		{
+			hashValue[appendData] = switch_payload[getData];//Fill hash from incoming message
+			printf("%02x", hashValue[getData]);
+		}//endFOR
+
+		 //MAC generation
+		//Calculate hash and compare to appended hash
+		chaskeyMsgLen = 444;
+		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
+		counter = 0;
+		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		memcpy(hashCalculated, hash, HASH_LEN);//Copy hash to message digest array
+		hashCalculated[4] = incomingToggleBit[0];//Insert toggle bit
+		if ((0 == memcmp((char*)hashValue, (char*)hashCalculated, HASH_LEN)))
+		{
+			printf("\n\n>>>>hashes match....packet forwarded to upper layers\n\n");
+		}
+		break;
+
 	default: printf("\nUnrecognized message\n");
 		break;
 	}//endSWITCH
@@ -1437,5 +1742,66 @@ void main()
 	///call functions to start communication
 	openInterfaces();//Open channels for sending and receiving
 	KE_firstMessage();//First message in key establishment
-	pcap_loop(outChannel, NEXT_INCOMING, handleKEMsg, NULL);//Start packet capture on port 2
+	pcap_loop(outChannel, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2#
+
+	do {
+		openInterfaces();//Keep channels open
+		if (msgFlag[0] == 0x01)
+		{
+			//KE_secondMessage();//Create and send message 2
+		}
+		if (msgFlag[0] == 0x02)
+		{
+			KE_thirdMessage();//Create and send message 3
+		}
+		if (msgFlag[0] == 0x03)
+		{
+			//KE_fourthMessage();//Create and send message 4
+		}
+		if (msgFlag[0] == 0x04)
+		{
+			KE_fifthMessage();//Create and send message 5
+		}
+		if (msgFlag[0] == 0x05)
+		{
+			//Send either message 6 or 7
+		}
+		if (msgFlag[0] == 0x06)
+		{
+			//Start using key
+			regularUsage();
+		}
+		if (msgFlag[0] == 0x07)
+		{
+			pcap_loop(outChannel, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+		}
+		if (msgFlag[0] == 0x08)
+		{
+			//Check if nextSessionKey pointer is NULL
+		}
+		if (msgFlag[0] == 0x09)
+		{
+			//Update currentSessionKey pointer and togglebit
+		}
+		if (msgFlag[0] == 0x10)
+		{
+			//Set currentSessionKey pointer to NULL to revoke keys
+			//pcap_loop(outChannel, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+		}
+		if (msgFlag[0] == 0x11)
+		{
+			//Increment Key Est. error count and check threshold
+		}
+		if (msgFlag[0] == 0x12)
+		{
+			//Increment MIC verification error count and check threshold
+		}
+		if (msgFlag[0] == 0x13)
+		{
+			//Regular key usage
+			//Incoming to destination
+			regularUsage();
+		}
+	} while (0);//endDO_WHILE
+
 }//end_MAIN

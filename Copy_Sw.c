@@ -326,7 +326,6 @@ unsigned char plaintext[PACKET_SIZE];//Plaintext message for hashing
 
 unsigned char *hashedPacket;//Pointer to packet segment for hashing
 unsigned char *oldDigest;//Pointer to packet message digest
-unsigned char *newDigest;//Pointer to recalculated message digest
 
 ///Counters
 int counter;
@@ -344,6 +343,7 @@ int checkData = 0;
 ///Temporary array
 unsigned char RandomNum[] = "";
 unsigned char challengeVal[] = "";
+unsigned char newDigest[] = "";
 //---------------------------------------------------------------------------------------
 //                AES FUNCTIONS
 //Author: kokke
@@ -1650,25 +1650,26 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			appendData++;
 		}//endFOR
 		
-		/*
+		
 		//MAC generation
 		//Calculate hash and compare to appended hash
-		chaskeyMsgLen = 486;
+		chaskeyMsgLen = 444;
 		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
 		counter = 0;
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
-		memcpy(hash, newDigest, HASH_LEN);//Copy hash to message digest array	
+		memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
 		newDigest[4] = toggleBit[0];//Insert toggle bit
 		//Compare Hashes
 		if ((0 == memcmp((char*)hashValue, (char*)newDigest, HASH_LEN)))
 		{
 			printf("\n\n>>>>hashes match....forwarding packing to outbound port\n\n");
 			printf("\n\nCalculating new MIC\n");
-			chaskeyMsgLen = 486;
-			subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
+			chaskeyMsgLen = 444;
+			subkeys(chaskeySubkey1, chaskeySubkey2, EsSession_Key);//call to key schedule function
 			counter = 0;
 			chaskey(hash, plaintext, EsSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
-			hash[4] = toggleBit[0];//Insert toggle bit
+			memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
+			newDigest[4] = toggleBit[0];//Insert toggle bit
 			//Append new MIC
 			appendData = 444;
 			for (getData = 0; getData < HASH_LEN; getData++)
