@@ -1631,13 +1631,22 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			toggleBit[0] = incomingToggleBit[0];
 		}//endIF	
 
+		//Retrieve payload
+		appendData = 0;
+		for (getData = 1; getData < 445; getData++)
+		{
+			plaintext[appendData] = ES_payload[getData];//Fill payload array for decryption
+			appendData++;
+		}//endFOR
+		printf("\n");
+		
 		//Retrieve MIC
-		appendData = 445;
 		printf("\n\nIncoming MIC: \n");
 		for (getData = 0; getData < HASH_LEN; getData++)
 		{
 			hashValue[getData] = ES_payload[appendData];//Fill hash from incoming message
 			printf("%02x", hashValue[getData]);
+			appendData++;
 		}//endFOR
 
 		//MAC generation
