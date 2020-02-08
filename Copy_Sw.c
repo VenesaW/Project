@@ -322,7 +322,7 @@ unsigned char z[] = " ";//bit string output of Chaskey from which to take key
 unsigned char hashCalculated[HASH_LEN];//Hash calculated by the switch
 unsigned char hashValue[HASH_LEN];//Packet hash value
 unsigned char packet[PACKET_SIZE];//Array to hold regular AFDX message with hash
-unsigned char plaintext[PACKET_PAYLOAD];//Plaintext message for hashing
+unsigned char plaintext[PACKET_SIZE];//Plaintext message for hashing
 
 unsigned char *hashedPacket;//Pointer to packet segment for hashing
 unsigned char *oldDigest;//Pointer to packet message digest
@@ -1454,7 +1454,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 	v4hdr = (struct ipheader*)(in_packet + SIZE_ETHERNET);//IP header offset
 	udpMsg2 = (struct udpheader*)(in_packet + SIZE_ETHERNET + SIZE_IP);//UDP header offset
 	ES_payload = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP);//Payload offset
-	oldDigest = (u_char *)(in_packet + SIZE_ETHERNET + SIZE_IP + SIZE_UDP + PACKET_PAYLOAD + 1);//Hash offset
 
 	printf("\n---------------------------------------------------------------------\n");
 	printf("Grabbed packet of length %d\n", header->len);
@@ -1621,7 +1620,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		}//endFOR
 
 		//Retrieve toggle bit
-		incomingToggleBit[0] = oldDigest[3];
+		incomingToggleBit[0] = ES_payload[448];
 		printf("\nCurrent toggle bit:%02x", toggleBit[0]);
 		printf("\nIncoming toggle bit:%02x", incomingToggleBit[0]);
 		if (incomingToggleBit[0] != toggleBit[0])
@@ -1643,10 +1642,11 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		//Retrieve MIC
 		printf("\n\nIncoming MIC: \n");
-		for (getData = 0; getData < hashLen; getData++)
+		appendData = 445
+		for (getData = 0; getData < 3; getData++)
 		{
-			//hashValue[appendData] = oldDigest[getData];//Fill payload array for decryption
-			printf("%02x", oldDigest[getData]);
+			hashValue[getData] = ES_payload[appendData];//Fill payload array for decryption
+			printf("%02x", hashValue[getData]);
 		}//endFOR
 		
 		//MAC generation
