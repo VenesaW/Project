@@ -1634,18 +1634,21 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 
 		//Retrieve payload
 		appendData = 0;
-		for (getData = 1; getData < PACKET_SIZE + 1; getData++)
+		for (getData = 1; getData < PACKET_PAYLOAD + 1; getData++)
 		{
 			plaintext[appendData] = ES_payload[getData];//Fill payload array for decryption
 			appendData++;
 		}//endFOR
 		printf("\n");
 		
-		/*//Retrieve MIC
+		//Retrieve MIC
 		printf("\n\nIncoming MIC: \n");
-		printf("%02x", oldDigest[0]);
-
-
+		for (getData = 0; getData < hashLen; getData++)
+		{
+			hashValue[appendData] = oldDigest[getData];//Fill payload array for decryption
+			printf("\n%02x\n", hashValue[getData]);
+		}//endFOR
+		
 		//MAC generation
 		//Calculate hash and compare to appended hash
 		chaskeyMsgLen = 486;
