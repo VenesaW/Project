@@ -340,6 +340,7 @@ int checkData = 0;
 
 ///Temporary array
 unsigned char RandomNum[] = "";
+unsigned char challengeVal[] = "";
 //---------------------------------------------------------------------------------------
 //                AES FUNCTIONS
 //Author: kokke
@@ -1385,6 +1386,24 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			//Retrieve message 5 challenge response
 			//Retrieve toggle bit;
 			printf("\nChallenge response:\n");
+			appendData = 0;
+			for (getData = 1; getData < MSG1_PAYLOAD_LEN + 1; getData++)
+			{
+				challengeVal[appendData] = ES_payload[getData];//Fill payload array for decryption
+				printf("%c", challengeVal[appendData]);
+				appendData++;
+			}//endFOR
+			printf("\n");
+			//Compare H(Sw) == H(ES)
+			if ((0 == memcmp((char*)challengeVal, (char*)Sw_challengeHash, HASH_LEN)))
+			{
+				printf("\nChallenge successful\n");
+				msgFlag[0] = (0x06);
+			}
+			else{
+				printf("\nChallenge unsuccessful...restarting key establishment\n");
+				msgFlag[0] = (0x07);
+			}//endIF_ELSE
 		break;
 		
 		case 0x06:
@@ -1446,7 +1465,6 @@ void main()
 		{
 			//generate session keys
 			sessionKeys();
-			printf("\ncalling msg 4 fn\n");
 			KE_fourthMessage();//Create and send message 4
 		}
 		if(msgFlag[0] == 0x04)
@@ -1463,7 +1481,7 @@ void main()
 		}
 		if(msgFlag[0] == 0x07)
 		{
-			pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
+			//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Restart Key Est
 		}
 		if(msgFlag[0] == 0x08)
 		{
