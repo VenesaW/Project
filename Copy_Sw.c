@@ -1386,10 +1386,10 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\nKey Establishment Message Type 5 recognized\n");
 			//Retrieve message 5 challenge response
 			//Retrieve toggle bit;
-			toggleBit[0] = ES_payload[6];
+			toggleBit[0] = ES_payload[5];
 			printf("\n Current toggle bit:%02x", toggleBit[0]);
 			//Set toggle bit
-			Sw_challengeHash[5] = toggleBit[0];
+			Sw_challengeHash[4] = toggleBit[0];
 						
 			printf("\nES Challenge response:\n");
 			appendData = 0;
