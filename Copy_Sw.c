@@ -1642,7 +1642,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		//Retrieve MIC
 		printf("\n\nIncoming MIC: \n");
-		for (getData = 0; getData < HASH_LEN; getData++)
+		for (getData = 0; getData < hashLen; getData++)
 		{
 			hashValue[getData] = ES_payload[appendData];//Fill hash from incoming message
 			printf("%02x", hashValue[getData]);
