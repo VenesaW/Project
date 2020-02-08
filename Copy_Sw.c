@@ -1652,16 +1652,16 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		//MAC generation
 		//Calculate hash and compare to appended hash
+		counter = 0;
 		chaskeyMsgLen = 444;
 		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
-		counter = 0;
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
 		newDigest[4] = toggleBit[0];//Insert toggle bit
 		printf("\n\nCalculated MIC: \n");
 		for (getData = 0; getData < hashLen; getData++)
 		{
-			printf("%02x", newDigest[getData]);
+			printf("%02x", hash[getData]);
 		}//endFOR
 		//Compare Hashes
 		if ((0 == memcmp((char*)hashValue, (char*)newDigest, HASH_LEN)))
