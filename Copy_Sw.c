@@ -55,7 +55,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 #define KEY_EST_MSG2_LEN 115 //Length of KEY EST MSG 2 packet
 #define KEY_EST_MSG3_LEN 107 //Length of KEY EST MSG 3 packet
 #define KEY_EST_MSG4_LEN 59 //Length of KEY EST MSG 4 packet
-#define KEY_EST_MSG5_LEN 50 //Length of KEY EST MSG 5 packet
+#define KEY_EST_MSG5_LEN 51 //Length of KEY EST MSG 5 packet
 #define KEY_EST_MSG6_LEN 59 //Length of KEY EST MSG 6 packet
 #define KEY_EST_MSG7_LEN 59 //Length of KEY EST MSG 7 packet
 #define KEY_EST_MSG8_LEN 44 //Length of KEY EST MSG 8 packet
@@ -1134,12 +1134,6 @@ void KE_fourthMessage()
 	//Generate challenge response
 	counter = 5;
 	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
-	printf("\nSw Challenge hash:\n");
-	for (getData = 0; getData < hashLen; getData++)
-	{
-		printf("%02x", hash[getData]);
-	}//endFOR
-	printf("\n");
 	memcpy(Sw_challengeHash, hash, HASH_LEN);
 
 	//Append flag
