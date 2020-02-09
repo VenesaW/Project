@@ -1684,6 +1684,12 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		}//endFOR
 		
 		digestVal[4] = incomingToggleBit[0];
+		
+		for (getData = 0; getData < hashLen; getData++)
+		{
+			printf("%02x", digestVal[getData]);
+		}//endFOR
+		
 		//Compare Hashes
 		if ((0 == memcmp((char*)hashValue, (char*)digestVal, HASH_LEN)))
 		{
