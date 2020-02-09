@@ -1041,6 +1041,9 @@ void sessionKeys()
 	memcpy(w + 60, salt, 20);
 
 	chaskeyMsgLen = 80;
+	memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
+	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+	subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
 
 	printf("\nSession Key:\n");
 	for (c = 1; c <= d; c++)
@@ -1303,6 +1306,9 @@ void KE_fourthMessage()
 	chaskeyMsgLen = 16;
 	//Generate challenge response
 	counter = 5;
+	memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
+	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+	subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
 	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
 	memcpy(Sw_challengeHash, hash, HASH_LEN);
 
@@ -1654,7 +1660,9 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		//Calculate hash and compare to appended hash
 		counter = 0;
 		chaskeyMsgLen = 444;
-		//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
+		memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
+		memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function*******************************
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
 		newDigest[4] = toggleBit[0];//Insert toggle bit
@@ -1670,7 +1678,9 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\n\n>>>>hashes match....forwarding packing to outbound port\n\n");
 			printf("\n\nCalculating new MIC\n");
 			chaskeyMsgLen = 444;
-			subkeys(chaskeySubkey1, chaskeySubkey2, EsSession_Key);//call to key schedule function
+			memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
+			memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+			subkeys(chaskeySubkey1, chaskeySubkey2, EsSession_Key);//call to key schedule function******************************************
 			counter = 0;
 			chaskey(hash, plaintext, EsSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 			memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
