@@ -854,9 +854,10 @@ void subkeys(unsigned int subkey1[4], unsigned int subkey2[4], const unsigned in
 
 //Calculation of MAC
 //Parameters: pointer to hash, hash length,  message, message length, key, subkey 1, subkey 2
-unsigned char* chaskey(unsigned char *hash, const unsigned char *msg, const unsigned int key[4], const unsigned int subkey1[4], const unsigned int subkey2[4])
+void chaskey(unsigned char *hash, const unsigned char *msg, const unsigned int key[4], const unsigned int subkey1[4], const unsigned int subkey2[4])
 {
-	counter++;
+	counter++;//increment counter
+
 	//const unsigned int msgLen = 5;
 	const unsigned int *M = (unsigned int*)msg;
 	const unsigned int *end = M + (((chaskeyMsgLen - 1) >> 4) << 2); /* pointer to last message block */
@@ -958,15 +959,17 @@ unsigned char* chaskey(unsigned char *hash, const unsigned char *msg, const unsi
 	v[2] ^= last[2];
 	v[3] ^= last[3];
 
+
 	if (counter == 1)
 	{
-		memcpy(TSNMICinput, SwSession_Key, 16);//Create "input" string with master key
+		memcpy(TSNMICinput, ESSession_Key, 16);//Create "input" string with master key
 		memcpy(TSNMICinput + 16, hash, 8);//Append first hash output to "input"
 		chaskeyMsgLen = 48;//Chaskey input is now 48 bytes
-		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
+		chaskey(hash, plaintext, ESSession_Key, chaskeySubkey1, chaskeySubkey2);
 	}//if
 
 	counter = 0;//Reset counter
+
 	memcpy(hash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash  
 }//end_CHASKEY-12
 //---------------------------------------------------------------------------------------
@@ -1321,7 +1324,7 @@ void KE_fourthMessage()
 	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
 		
 	subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
-	printf("\nMesssage 4 subkeys\n");
+	printf("\nMessage 4 subkeys\n");
 	for (getData = 0; getData < KEY_LEN; getData++)
 	{
 		printf("%02x", chaskeySubkey1[getData]);
