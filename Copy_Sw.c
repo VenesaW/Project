@@ -1059,6 +1059,12 @@ void sessionKeys()
 		printf("%02x", chaskeySubkey2[getData]);
 	}
 	printf("\n\n");
+	printf("\nmasterkey:\n");
+	for (getData = 0; getData < KEY_LEN; getData++)
+	{
+		printf("%02x", SwSession_Key[getData]);
+	}
+	printf("\n");
 	printf("\nSession Key:\n");
 	for (c = 1; c <= d; c++)
 	{
@@ -1335,6 +1341,12 @@ void KE_fourthMessage()
 		printf("%02x", chaskeySubkey2[getData]);
 	}
 	printf("\n\n");
+	printf("\nmasterkey:\n");
+	for (getData = 0; getData < KEY_LEN; getData++)
+	{
+		printf("%02x", SwSession_Key[getData]);
+	}
+	printf("\n");
 	
 	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
 	memcpy(Sw_challengeHash, hash, HASH_LEN);
