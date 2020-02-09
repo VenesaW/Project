@@ -1654,11 +1654,12 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		//Calculate hash and compare to appended hash
 		counter = 0;
 		chaskeyMsgLen = 444;
-		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
+		//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
 		newDigest[4] = toggleBit[0];//Insert toggle bit
-		printf("\n\nCalculated MIC: \n");
+		printf("\n\nCalculated MIC: \n");	
+	
 		for (getData = 0; getData < hashLen; getData++)
 		{
 			printf("%02x", hash[getData]);
@@ -1689,7 +1690,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			//increment error counter
 			//countinue listening until error threshold*************************************************************
 		}//endIF_ELSE*/
-		printf("\nexit?\n");
+		printf("\nexit?\n\n");
 		break;
 
 	default: printf("\nUnrecognized message\n");
