@@ -343,10 +343,10 @@ int appendData;//Used in for loop for parsing packet parameters
 int getData;//Used in FOR loop to get packet 
 int checkData = 0;
 
-///Temporary array
+///Temporary arrays
 unsigned char RandomNum[] = "";
 unsigned char challengeVal[] = "";
-unsigned char newDigest[] = "";
+unsigned char newDigest[HASH_LEN];
 //---------------------------------------------------------------------------------------
 //                AES FUNCTIONS
 //Author: kokke
@@ -1651,7 +1651,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		for (getData = 0; getData < PACKET_PAYLOAD; getData++)
 		{
 			plaintext[getData] = ES_payload[appendData];//Fill payload array for hashing
-			printf("%02x", plaintext[getData]);
+			//printf("%02x", plaintext[getData]);
 			appendData++;
 		}//endFOR
 		printf("\n\nIncoming MIC: \n");
