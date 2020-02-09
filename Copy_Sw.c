@@ -1671,17 +1671,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		//memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
 		//memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
 		//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function*******************************
-		printf("\nMessage 13 subkeys\n");
-		for (getData = 0; getData < KEY_LEN; getData++)
-		{
-			printf("%02x", chaskeySubkey1[getData]);
-		}
-		printf("\n");
-		for (getData = 0; getData < KEY_LEN; getData++)
-		{
-			printf("%02x", chaskeySubkey2[getData]);
-		}
-		printf("\n\n");
 		
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
@@ -1690,7 +1679,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 	
 		for (getData = 0; getData < hashLen; getData++)
 		{
-			printf("%02x", hash[getData]);
+			printf("%02x", newDigest[getData]);
 		}//endFOR
 		//Compare Hashes
 		if ((0 == memcmp((char*)hashValue, (char*)newDigest, HASH_LEN)))
