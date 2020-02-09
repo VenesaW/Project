@@ -1683,6 +1683,10 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			digestVal[getData] = hash[getData];
 		}//endFOR
 		
+		if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
+		{
+			toggleBit[0] = (0x01);//set to 1
+		}
 		printf("\n\n");
 		digestVal[3] = toggleBit[0];
 		
