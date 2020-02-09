@@ -346,6 +346,7 @@ int checkData = 0;
 ///Temporary arrays
 unsigned char RandomNum[] = "";
 unsigned char challengeVal[] = "";
+unsigned char digestVal[] = "";
 unsigned char newDigest[HASH_LEN];
 //---------------------------------------------------------------------------------------
 //                AES FUNCTIONS
@@ -1673,16 +1674,18 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function*******************************
 		
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
-		memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
-		newDigest[4] = toggleBit[0];//Insert toggle bit
+		//memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
+		//newDigest[4] = toggleBit[0];//Insert toggle bit
 		printf("\n\nCalculated MIC: \n");	
-	
 		for (getData = 0; getData < hashLen; getData++)
 		{
-			printf("%02x", newDigest[getData]);
+			printf("%02x", hash[getData]);
+			digestVal[getData] = hash[getData];
 		}//endFOR
+		
+		digestVal[4] = incomingToggleBit[0];
 		//Compare Hashes
-		if ((0 == memcmp((char*)hashValue, (char*)newDigest, HASH_LEN)))
+		if ((0 == memcmp((char*)hashValue, (char*)digestVal, HASH_LEN)))
 		{
 			printf("\n\n>>>>hashes match....forwarding packing to outbound port\n\n");
 			printf("\n\nCalculating new MIC\n");
@@ -1692,8 +1695,13 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
 			counter = 0;
 			chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
-			memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
-			newDigest[4] = toggleBit[0];//Insert toggle bit
+			//memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
+			//newDigest[4] = toggleBit[0];//Insert toggle bit
+			/*for (getData = 0; getData < HASH_LEN; getData++)
+			{
+				digestVal[getData] = hash[getData];
+				appendData++;
+			}//endFOR*/
 			//Append new MIC
 			appendData = 444;
 			for (getData = 0; getData < HASH_LEN; getData++)
