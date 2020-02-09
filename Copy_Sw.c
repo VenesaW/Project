@@ -1282,7 +1282,7 @@ void regularUsage()
 	//Append flag
 	packet[42] = (0x13);//Message 13 flag
 
-	memcpy(packet + 42, plaintext, 452);
+	memcpy(packet + 43, plaintext, 452);
 
 	//send packet
 	pcap_sendpacket(Channel204, packet, REG_MSG13_LEN);//Message 13 packet
