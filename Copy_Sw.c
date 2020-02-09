@@ -1633,11 +1633,11 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 
 		printf("\n\n");
 		//Retrieve payload
-		appendData = 0;
-		for (getData = 1; getData < PACKET_PAYLOAD + 1; getData++)
+		appendData = 1;
+		for (getData = 0; getData < PACKET_PAYLOAD; getData++)
 		{
-			plaintext[appendData] = ES_payload[getData];//Fill payload array for decryption
-			printf("%02x", plaintext[appendData]);
+			plaintext[getData] = ES_payload[appendData];//Fill payload array for hashing
+			printf("%02x", plaintext[getData]);
 			appendData++;
 		}//endFOR
 		printf("\n\nIncoming MIC: \n");
