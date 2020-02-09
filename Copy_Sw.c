@@ -1043,8 +1043,19 @@ void sessionKeys()
 	chaskeyMsgLen = 80;
 	memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
 	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+	
 	subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
-
+	printf("\nSession key subkeys\n");
+	for (getData = 0; getData < KEY_LEN; getData++)
+	{
+		printf("%02x", chaskeySubkey1[getData]);
+	}
+	printf("\n");
+	for (getData = 0; getData < KEY_LEN; getData++)
+	{
+		printf("%02x", chaskeySubkey2[getData]);
+	}
+	printf("\n\n");
 	printf("\nSession Key:\n");
 	for (c = 1; c <= d; c++)
 	{
@@ -1303,12 +1314,25 @@ void KE_fourthMessage()
 	msg4_packet[40] = (0xaa);
 	msg4_packet[41] = (0xff);//random
 
-	chaskeyMsgLen = 16;
 	//Generate challenge response
+	chaskeyMsgLen = 16;
 	counter = 5;
 	memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
 	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+		
 	subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
+	printf("\nMesssage 4 subkeys\n");
+	for (getData = 0; getData < KEY_LEN; getData++)
+	{
+		printf("%02x", chaskeySubkey1[getData]);
+	}
+	printf("\n");
+	for (getData = 0; getData < KEY_LEN; getData++)
+	{
+		printf("%02x", chaskeySubkey2[getData]);
+	}
+	printf("\n\n");
+	
 	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
 	memcpy(Sw_challengeHash, hash, HASH_LEN);
 
@@ -1563,7 +1587,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		//Retrieve message 5 challenge response
 		//Retrieve toggle bit;
 		toggleBit[0] = ES_payload[5];
-		printf("\n Current toggle bit:%02x", toggleBit[0]);
+		printf("\nCurrent toggle bit:%02x\n", toggleBit[0]);
 		//Set toggle bit
 		Sw_challengeHash[4] = toggleBit[0];
 
@@ -1662,7 +1686,20 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		chaskeyMsgLen = 444;
 		memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
 		memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+		
 		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function*******************************
+		printf("\nMessage 13 subkeys\n");
+		for (getData = 0; getData < KEY_LEN; getData++)
+		{
+			printf("%02x", chaskeySubkey1[getData]);
+		}
+		printf("\n");
+		for (getData = 0; getData < KEY_LEN; getData++)
+		{
+			printf("%02x", chaskeySubkey2[getData]);
+		}
+		printf("\n\n");
+		
 		chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
 		newDigest[4] = toggleBit[0];//Insert toggle bit
@@ -1680,6 +1717,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			chaskeyMsgLen = 444;
 			memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
 			memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+			
 			subkeys(chaskeySubkey1, chaskeySubkey2, EsSession_Key);//call to key schedule function******************************************
 			counter = 0;
 			chaskey(hash, plaintext, EsSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
