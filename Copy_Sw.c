@@ -214,8 +214,11 @@ char* SwMaster_Key = "AA112233445566778899AABBCCDDEEFF";//pointer to master key 
 unsigned int SwSession_Key[KEY_LEN] = { 0x833D3433, 0x009F389F, 0x2398E64F, 0x417ACF39 };//master key as hex (ES to Switch)
 unsigned int EsSession_Key[KEY_LEN] = { 0x3433833D, 0x389F009F, 0xE64F2398, 0xCF39417A };//master key as hex (Switch to ES)
 unsigned char sessionKey[32] = "833D3433009F389F2398E64F417ACF39";//master key as hex
+//unsigned char session2Key[32] = "3433833D389F009FE64F2398CF39417A";//master key as hex
 unsigned int chaskeySubkey1[KEY_LEN];//subkey1
 unsigned int chaskeySubkey2[KEY_LEN];//subkey2
+//unsigned int chaskey1Subkey1[KEY_LEN];//subkey1
+//unsigned int chaskey2Subkey2[KEY_LEN];//subkey2
 unsigned int chaskeyMsgLen;
 unsigned int hashLen = 8;
 unsigned char TSNMICinput[] = "";//TSNMIC concatenated payload
@@ -1048,23 +1051,7 @@ void sessionKeys()
 	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
 	
 	subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
-	printf("\nSession key subkeys\n");
-	for (getData = 0; getData < KEY_LEN; getData++)
-	{
-		printf("%02x", chaskeySubkey1[getData]);
-	}
-	printf("\n");
-	for (getData = 0; getData < KEY_LEN; getData++)
-	{
-		printf("%02x", chaskeySubkey2[getData]);
-	}
-	printf("\n\n");
-	printf("\nmasterkey:\n");
-	for (getData = 0; getData < KEY_LEN; getData++)
-	{
-		printf("%02x", SwSession_Key[getData]);
-	}
-	printf("\n");
+	
 	printf("\nSession Key:\n");
 	for (c = 1; c <= d; c++)
 	{
@@ -1326,28 +1313,10 @@ void KE_fourthMessage()
 	//Generate challenge response
 	chaskeyMsgLen = 16;
 	counter = 5;
-	memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
-	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+	//memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
+	//memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+	//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
 		
-	subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
-	printf("\nMessage 4 subkeys\n");
-	for (getData = 0; getData < KEY_LEN; getData++)
-	{
-		printf("%02x", chaskeySubkey1[getData]);
-	}
-	printf("\n");
-	for (getData = 0; getData < KEY_LEN; getData++)
-	{
-		printf("%02x", chaskeySubkey2[getData]);
-	}
-	printf("\n\n");
-	printf("\nmasterkey:\n");
-	for (getData = 0; getData < KEY_LEN; getData++)
-	{
-		printf("%02x", SwSession_Key[getData]);
-	}
-	printf("\n");
-	
 	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
 	memcpy(Sw_challengeHash, hash, HASH_LEN);
 
@@ -1699,10 +1668,9 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		//Calculate hash and compare to appended hash
 		counter = 0;
 		chaskeyMsgLen = 444;
-		memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
-		memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
-		
-		subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function*******************************
+		//memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
+		//memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+		//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function*******************************
 		printf("\nMessage 13 subkeys\n");
 		for (getData = 0; getData < KEY_LEN; getData++)
 		{
@@ -1730,12 +1698,11 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\n\n>>>>hashes match....forwarding packing to outbound port\n\n");
 			printf("\n\nCalculating new MIC\n");
 			chaskeyMsgLen = 444;
-			memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
-			memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
-			
-			subkeys(chaskeySubkey1, chaskeySubkey2, EsSession_Key);//call to key schedule function******************************************
+			//memset(&chaskeySubkey1[0], 0, sizeof(chaskeySubkey1));
+			//memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
+			//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
 			counter = 0;
-			chaskey(hash, plaintext, EsSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+			chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 			memcpy(newDigest, hash, HASH_LEN);//Copy hash to message digest array	
 			newDigest[4] = toggleBit[0];//Insert toggle bit
 			//Append new MIC
