@@ -1329,6 +1329,17 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		}//endFOR
 		
 		printf("\n\n");
+		
+		//Retrieve toggle bit
+		if (toggleVal == 1)
+		{
+			toggleBit[0] = (0x01);
+		}
+		else
+		{
+			toggleBit[0] = (0x00);
+		}
+		
 		integrityVal[3] = toggleBit[0];
 		printf("\n\nToggle + MIC: \n");
 		for (getData = 0; getData < hashLen; getData++)
