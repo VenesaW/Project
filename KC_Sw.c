@@ -1362,9 +1362,14 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				integrityVal[getData] = hash[getData];
 			}//endFOR
 			
-			if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
+			//Retrieve toggle bit
+			if (toggleVal == 1)
 			{
-				toggleBit[0] = (0x01);//set to 1
+				toggleBit[0] = (0x01);
+			}
+			else
+			{
+				toggleBit[0] = (0x00);
 			}
 			printf("\n\n");
 			integrityVal[3] = toggleBit[0];
@@ -1376,6 +1381,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				plaintext[appendData] = integrityVal[getData];//Fill hash from incoming message
 				appendData++;
 			}//endFOR
+			regularUsage();
 		}//endIF
 		else
 		{
