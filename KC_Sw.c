@@ -1328,12 +1328,13 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			integrityVal[getData] = hash[getData];
 		}//endFOR
 		
-		if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
-		{
-			toggleBit[0] = (0x01);//set to 1
-		}
 		printf("\n\n");
 		integrityVal[3] = toggleBit[0];
+		printf("\n\nToggle + MIC: \n");
+		for (getData = 0; getData < hashLen; getData++)
+		{
+			printf("%02x", integrityVal[getData]);
+		}//endFOR
 				
 		//Compare Hashes
 		if ((0 == memcmp((char*)hashValue, (char*)integrityVal, HASH_LEN)))
