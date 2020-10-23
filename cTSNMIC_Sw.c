@@ -215,16 +215,16 @@ struct udpheader {
 //---------------------------------------------------------------------------------------
 //For keying material
 ///Master Key paramaters
-char* SwMaster_Key = "AA112233445566778899AABBCCDDEEFF";//pointer to master key (encryption and decryption) as a character stream
+//char* SwMaster_Key = "AA112233445566778899AABBCCDDEEFF";//pointer to master key (encryption and decryption) as a character stream
 
 ///Session Key paramaters
 unsigned int SwSession_Key[KEY_LEN] = { 0x833D3433, 0x009F389F, 0x2398E64F, 0x417ACF39 };//master key as hex (ES to Switch)
 unsigned int SwSession_next_Key[KEY_LEN] = { 0x22F389F,0x833D3433,  0x417ACF39, 0x2398E64F };//master key as hex (ES to Switch_next key
 unsigned int EsSession_Key[KEY_LEN] = { 0x3433833D, 0x389F009F, 0xE64F2398, 0xCF39417A };//master key as hex (Switch to ES)
+unsigned int masterKey[32] = { 0xAA112233, 0x44556677, 0x8899AABB, 0xCCDDEEFF };//Switch Master key
 unsigned char sessionKey[32] = "833D3433009F389F2398E64F417ACF39";//Switch to ES session key as hex
 unsigned char session2Key[32] = "3433833D389F009FE64F2398CF39417A";//ES to Switch session key as hex
 unsigned char sessionKey_next[32] = "22F389F833D34332398E64F417ACF39";//Next Switch to ES session key as hex
-unsigned char masterKey[32] = "AA112233445566778899AABBCCDDEEFF";//ES Master key
 unsigned int chaskeySubkey1[KEY_LEN];//subkey1
 unsigned int chaskeySubkey2[KEY_LEN];//subkey2
 unsigned int chaskey1Subkey1[KEY_LEN];//subkey1
@@ -1412,7 +1412,8 @@ void KE_twelfthMessage()
 	//Generate Hash (identifierHash)	
 	counter = 1;
 	chaskeyMsgLen = 8;
-	chaskey(hash, Sw_SWID, masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+	Sw_MasterKey = &masterKey;
+	chaskey(hash, Sw_SWID, Sw_MasterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 	printf("\n\nCalculated MIC: \n");	
 	for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 	{
@@ -1604,7 +1605,8 @@ void KE_tenthMessage()
 	//Generate Hash (identifierHash)
 	counter = 1;
 	chaskeyMsgLen = 8;
-	chaskey(hash, Sw_SWID, masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+	Sw_MasterKey = masterKey;
+	chaskey(hash, Sw_SWID, Sw_MasterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 	printf("\n\nCalculated MIC: \n");	
 	for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 	{
@@ -1701,7 +1703,8 @@ void KE_ninthMessage()
 	//Generate Hash (identifierHash)
 	counter = 1;
 	chaskeyMsgLen = 8;
-	chaskey(hash, Sw_SWID, masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+	Sw_MasterKey = &masterKey;
+	chaskey(hash, Sw_SWID, Sw_MasterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 	printf("\n\nCalculated MIC: \n");	
 	for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 	{
@@ -1796,7 +1799,8 @@ void KE_eighthMessage()
 	//Generate Hash (identifierHash)
 	counter = 1;
 	chaskeyMsgLen = 8;
-	chaskey(hash, Sw_SWID, masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+	Sw_MasterKey = &masterKey;
+	chaskey(hash, Sw_SWID, Sw_MasterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 	printf("\n\nCalculated MIC: \n");	
 	for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 	{
@@ -2444,7 +2448,8 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		//Generate Hash (ParameterCompHash)
 		counter = 1;
 		chaskeyMsgLen = 8;
-		chaskey(hash, Sw_SWID, masterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+		Sw_MasterKey = &masterKey;
+		chaskey(hash, Sw_SWID, Sw_MasterKey, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		printf("\n\nCalculated MIC: \n");	
 		for (getData = 0; getData < IDENTIFIER_LEN; getData++)
 		{
