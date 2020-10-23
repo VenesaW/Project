@@ -330,7 +330,6 @@ unsigned char ES_swID[IDENTIFIER_LEN];//Identifier from Key Establishment messag
 unsigned char ES_keyMat[KEYING_MAT_LEN];//Keying material from Key Establishment message 2
 unsigned char ES_Nonce[NONCE_LEN];//Nonce from Key Establishment message 2
 unsigned char ES_challengeResponse[CHALLENGE_LEN];//Challenge from Key Establishment message 4
-unsigned char ParameterCompHash[] = " ";//Temporarily stores hashed Identifier parameter from Key Establishment messages 8, 9, 10 and 11
 ///key establishment packet checkpoints
 unsigned char *ES_payload;//Pointer to packet payload for incoming Key Establishment messages
 unsigned char incoming_flag[] = "";//Array to hold the flag from incoming Key Establishment messages
