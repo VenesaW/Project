@@ -2064,7 +2064,7 @@ void KE_fourthMessage()
 	//memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
 	//subkeys(chaskeySubkey1, chaskeySubkey2, SwSession_Key);//call to key schedule function******************************************
 		
-	chaskey(hash, Sw_challenge, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
+	chaskey(hash, Sw_challenge, ESSession_Key, chaskeySubkey1, chaskeySubkey2);
 	memcpy(Sw_challengeHash, hash, HASH_LEN);
 
 	//Append flag
