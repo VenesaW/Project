@@ -2497,7 +2497,8 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			old_ESSession_Key = &ESSession_Key;
 			curr_ESSession_Key = &ESSession_next_Key;
 			curr_SwSession_Key = &SwSession_Key;
-			subkeys2(chaskey1Subkey1, chaskey2Subkey2, curr_ESSession_Key);//Generate subkeys
+			subkeys(chaskeySubkey1, chaskeySubkey2, curr_ESSession_Key);//Generate subkeys
+			subkeys2(chaskey1Subkey1, chaskey2Subkey2, curr_SwSession_Key);//Generate subkeys
 			printf("\nKey change over successful\n");
 			
 			//MAC generation
@@ -2511,13 +2512,13 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		else {
 			curr_ESSession_Key = &ESSession_Key;
 			curr_SwSession_Key = &SwSession_Key;
-			subkeys2(chaskey1Subkey1, chaskey2Subkey2, curr_ESSession_Key);//Generate subkeys
+			//subkeys2(chaskey1Subkey1, chaskey2Subkey2, curr_ESSession_Key);//Generate subkeys
 			
 			//MAC generation
 			//Calculate hash and compare to appended hash
 			counter = 0;
 			chaskeyMsgLen = 444;
-			chaskey2(hash, plaintext, curr_ESSession_Key, chaskey1Subkey1, chaskey2Subkey2);//pointer to returned chasekey mac calculation
+			chaskey(hash, plaintext, curr_ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 			toggleBit[0] = incomingToggleBit[0];
 		}//endIF_ELSE
 
@@ -2565,7 +2566,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			chaskeyMsgLen = 444;
 			counter = 0;
 			curr_SwSession_Key = &SwSession_Key;
-			chaskey(hash, plaintext, curr_SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+			chaskey2(hash, plaintext, curr_SwSession_Key, chaskey1Subkey1, chaskey2Subkey2);//pointer to returned chasekey mac calculation
 			printf("\n\nRe-calculated MIC: \n");	
 			for (getData = 0; getData < hashLen; getData++)
 			{
