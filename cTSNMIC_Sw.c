@@ -2518,6 +2518,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			counter = 0;
 			chaskeyMsgLen = 444;
 			chaskey2(hash, plaintext, curr_ESSession_Key, chaskey1Subkey1, chaskey2Subkey2);//pointer to returned chasekey mac calculation
+			toggleBit[0] = incomingToggleBit[0];
 		}//endIF_ELSE
 
 		printf("\n\n");
