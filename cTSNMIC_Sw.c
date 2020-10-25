@@ -2493,7 +2493,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		//Set Toggle Value
 		//Used to reset Toggle bit if it is later corrupted
-		if ((incomingToggleBit[0] 0= (0x00))
+		if ((incomingToggleBit[0] = (0x00)))
 		{
 			toggleVal = 0;
 		}
