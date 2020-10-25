@@ -2497,7 +2497,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		printf("\nIncoming toggle bit:%02x", incomingToggleBit[0]);
 		
 		//Used to reset Toggle bit if it gets corrupted
-		if (incomingBit[0] == (0x00))
+		if (incomingToggleBit[0] == (0x00))
 		{
 			toggleVal = 0;
 		}
