@@ -223,9 +223,10 @@ unsigned int ESSession_next_Key[KEY_LEN] = { 0x22F389F,0x833D3433,  0x417ACF39, 
 unsigned int SwSession_Key[KEY_LEN] = { 0x3433833D, 0x389F009F, 0xE64F2398, 0xCF39417A };//current session key as hex (Switch to ES)
 unsigned int SwSession_next_Key[KEY_LEN] = { 0x417ACF39, 0x2398E64F, 0x22F389F,0x833D3433 };//next session key as hex (Switch to ES key)
 unsigned int masterKey[32] = { 0xAA112233, 0x44556677, 0x8899AABB, 0xCCDDEEFF };//ES Master key
-unsigned char sessionKey[32] = "833D3433009F389F2398E64F417ACF39";//master key as hex
-unsigned char session2Key[32] = "3433833D389F009FE64F2398CF39417A";//master key as hex
-unsigned char sessionKey_next[32] = "22F389F833D34332398E64F417ACF39";//Next Switch to ES session key as hex
+unsigned char sessionKey[32] = "833D3433009F389F2398E64F417ACF39";//ES session key as string
+unsigned char session2Key[32] = "3433833D389F009FE64F2398CF39417A";//Switch session key as string
+unsigned char sessionKey_next[32] = "22F389F833D34332398E64F417ACF39";//Next ES session key as string
+unsigned char sessionKey_next2[32] = "417ACF392398E64F22F389F833D3433";//Next Switch session key as string
 unsigned int chaskeySubkey1[KEY_LEN];//subkey1
 unsigned int chaskeySubkey2[KEY_LEN];//subkey2
 unsigned int chaskey1Subkey1[KEY_LEN];//subkey1
