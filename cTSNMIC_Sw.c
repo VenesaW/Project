@@ -1200,7 +1200,7 @@ void sessionKeys()
 	}//FOR
 	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
 	{
-		s[c + 16] = switch_keyMat[c];
+		s[c + 16] = Sw_keyMat[c];
 	}//FOR
 
 	memcpy(h, s, 32);
