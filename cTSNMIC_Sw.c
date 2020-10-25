@@ -1200,7 +1200,7 @@ void sessionKeys()
 	}//FOR
 	for (c = 0; c <= KEYING_MATERIAL_LEN; c++)
 	{
-		s[c + 16] = Sw_keyMat[c];
+		s[c + 16] = switch_keyMat[c];
 	}//FOR
 
 	memcpy(h, s, 32);
@@ -1218,9 +1218,9 @@ void sessionKeys()
 	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
 	memset(&chaskey1Subkey1[0], 0, sizeof(chaskey1Subkey1));
 	memset(&chaskey2Subkey2[0], 0, sizeof(chaskey2Subkey2));
-	subkeys(chaskeySubkey1, chaskeySubkey2, ESSession_Key);//call to key schedule function******************************************
+	subkeys(chaskeySubkey1, chaskeySubkey2, ESSession_Key);//call to key schedule function*********************************
 	subkeys2(chaskey1Subkey1, chaskey2Subkey2, SwSession_Key);//call to key schedule function******************************************
-	
+
 	printf("\nSession Key:\n");
 	for (c = 1; c <= d; c++)
 	{
@@ -2524,8 +2524,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		else {
 			curr_ESSession_Key = &ESSession_Key;
 			curr_SwSession_Key = &SwSession_Key;
-			subkeys(chaskeySubkey1, chaskeySubkey2, curr_ESSession_Key);//Generate subkeys
-			
 			//MAC generation
 			//Calculate hash and compare to appended hash
 			counter = 0;
