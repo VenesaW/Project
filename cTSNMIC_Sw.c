@@ -1329,7 +1329,7 @@ void regularUsage()
 	//send packet
 	pcap_sendpacket(Channel204, packet, REG_MSG13_LEN);//Message 13 packet
 	//listen for messages from ES
-	//pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
+	pcap_loop(Channel204, NEXT_INCOMING, handleMsg, NULL);//Start packet capture on port 2
 }////end_REGULAR_USAGE
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -2519,13 +2519,12 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		
 		else if (incomingToggleBit[0] == toggleBit[0])
 		{
-			printf("\nNo key update\n");
+			//printf("\nNo key update\n");
 			//MAC generation
 			//Calculate hash and compare to appended hash
 			counter = 0;
 			chaskeyMsgLen = 444;
-			chaskey(hash, plaintext, ESSession_Key, chaskeySubkey1, chaskeySubkey2);
-			//chaskey(hash, plaintext, curr_ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+			chaskey(hash, plaintext, curr_ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 			toggleBit[0] = incomingToggleBit[0];
 		}//endIF_ELSE
 
@@ -2559,7 +2558,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		if ((0 == memcmp((char*)hashValue, (char*)integrityVal, HASH_LEN)))
 		{
 			printf("\n\n>>>>hashes match....forwarding packing to outbound port\n\n");
-			printf("\n\nCalculating new MIC\n");
+			printf("\nCalculating new MIC\n");
 			chaskeyMsgLen = 444;
 			counter = 0;
 			//curr_SwSession_Key = &SwSession_Key;
@@ -2570,7 +2569,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				printf("%02x", hash[getData]);
 				integrityVal[getData] = hash[getData];
 			}//endFOR
-			
+			printf("\n\n\n");
 			//Append new MIC
 			appendData = 444;
 			for (getData = 0; getData < HASH_LEN; getData++)
