@@ -1218,20 +1218,24 @@ void sessionKeys()
 	memset(&chaskeySubkey2[0], 0, sizeof(chaskeySubkey2));
 	memset(&chaskey1Subkey1[0], 0, sizeof(chaskey1Subkey1));
 	memset(&chaskey2Subkey2[0], 0, sizeof(chaskey2Subkey2));
-	subkeys(chaskeySubkey1, chaskeySubkey2, ESSession_Key);//call to key schedule function*********************************
-	subkeys2(chaskey1Subkey1, chaskey2Subkey2, SwSession_Key);//call to key schedule function******************************************
+	
+	curr_ESSession_Key = &ESSession_Key;
+	curr_SwSession_Key = &SwSession_Key;
+					
+	subkeys(chaskeySubkey1, chaskeySubkey2, curr_ESSession_Key);//call to key schedule function*********************************
+	subkeys2(chaskey1Subkey1, chaskey2Subkey2, curr_SwSession_Key);//call to key schedule function******************************************
 
 	printf("\nSession Key:\n");
 	for (c = 1; c <= d; c++)
 	{
 		if (c == 1)
 		{
-			chaskey(hash, h, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+			chaskey(hash, h, curr_ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
 			memcpy(z, hash, 8);
 		}
 		if (c >= 2)
 		{
-			chaskey(hash, w, ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
+			chaskey(hash, w, curr_ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chaskey mac calculation
 			memcpy(z + 8, hash, 8);
 		}
 	}//FOR
