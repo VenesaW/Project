@@ -2495,21 +2495,8 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		printf("\nCurrent toggle bit:%02x", toggleBit[0]);
 		printf("\nIncoming toggle bit:%02x", incomingToggleBit[0]);
 		
-		if (incomingToggleBit[0] == toggleBit[0])
-		{
-			printf("\nNo key update\n");
-			curr_ESSession_Key = &ESSession_Key;
-			curr_SwSession_Key = &SwSession_Key;
-			//MAC generation
-			//Calculate hash and compare to appended hash
-			counter = 0;
-			chaskeyMsgLen = 444;
-			chaskey(hash, plaintext, curr_ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
-			toggleBit[0] = incomingToggleBit[0];
-		}//endIF_ELSE
-			
 		//Key Change-Over
-		else if (incomingToggleBit[0] != toggleBit[0])
+		if (incomingToggleBit[0] != toggleBit[0])
 		{
 			//update session key pointer
 			printf("\nNew Toggle Bit detected...updating key pointers\n");
@@ -2528,6 +2515,17 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\nUpdating toggle bit...\n");
 			toggleBit[0] = incomingToggleBit[0];
 		}//endIF
+		
+		else if (incomingToggleBit[0] == toggleBit[0])
+		{
+			printf("\nNo key update\n");
+			//MAC generation
+			//Calculate hash and compare to appended hash
+			counter = 0;
+			chaskeyMsgLen = 444;
+			chaskey(hash, plaintext, curr_ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
+			toggleBit[0] = incomingToggleBit[0];
+		}//endIF_ELSE
 
 		printf("\n\n");
 		//Retrieve MIC
@@ -2540,11 +2538,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			appendData++;
 		}//endFOR
 		
-		//MAC generation
-		//Calculate hash and compare to appended hash
-		//counter = 0;
-		//chaskeyMsgLen = 444;
-		//chaskey(hash, plaintext, SwSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
 		printf("\n\nCalculated MIC: \n");	
 		for (getData = 0; getData < hashLen; getData++)
 		{
@@ -2555,14 +2548,8 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		//Reset Toggle bit if it gets corrupted
 		if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
 		{
-			if (toggleVal == 0)
-			{
-				toggleBit[0] = (0x00);//set to 0
-			}
-			else{
-				toggleBit[0] = (0x01);//set to 1
-			}//endIF_ELSE
-		}//endIF
+			toggleBit[0] = (0x01);//set to 1
+		}
 		printf("\n\n");
 		integrityVal[3] = toggleBit[0];
 				
@@ -2573,7 +2560,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\n\nCalculating new MIC\n");
 			chaskeyMsgLen = 444;
 			counter = 0;
-			curr_SwSession_Key = &SwSession_Key;
+			//curr_SwSession_Key = &SwSession_Key;
 			chaskey2(hash, plaintext, curr_SwSession_Key, chaskey1Subkey1, chaskey2Subkey2);//pointer to returned chasekey mac calculation
 			printf("\n\nRe-calculated MIC: \n");	
 			for (getData = 0; getData < hashLen; getData++)
@@ -2581,20 +2568,6 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				printf("%02x", hash[getData]);
 				integrityVal[getData] = hash[getData];
 			}//endFOR
-			
-			//Reset Toggle bit if it gets corrupted
-			if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
-			{
-				if (toggleVal == 0)
-				{
-					toggleBit[0] = (0x00);//set to 0
-				}
-				else{
-					toggleBit[0] = (0x01);//set to 1
-				}//endIF_ELSE
-			}//endIF
-			printf("\n\n");
-			integrityVal[3] = toggleBit[0];
 			
 			//Append new MIC
 			appendData = 444;
