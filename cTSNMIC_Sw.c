@@ -1015,13 +1015,13 @@ void chaskey(unsigned char *hash, const unsigned char *msg, const unsigned int k
 		memcpy(TSNMICinput, sessionKey, 32);//Create "input" string with master key
 		memcpy(TSNMICinput + 32, hash, 8);//Append first hash output to "input"
 		chaskeyMsgLen = 40;//Chaskey input is now 48 bytes
-		chaskey(hash, TSNMICinput, SwSession_Key, chaskeySubkey1, chaskeySubkey2);
+		chaskey(hash, TSNMICinput, ESSession_Key, chaskeySubkey1, chaskeySubkey2);
 	}//if
 
 	counter = 0;//Reset counter
 
 	memcpy(hash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash  
-}//end_CHASKEY-12
+}//end_CHASKEY-12_FIRST
 //*****************************************************************************************************************************************************
 void chaskey2(unsigned char *hash, const unsigned char *msg, const unsigned int key[4], const unsigned int subkey1[4], const unsigned int subkey2[4])
 {
@@ -1134,13 +1134,13 @@ void chaskey2(unsigned char *hash, const unsigned char *msg, const unsigned int 
 		memcpy(TSNMICinput, session2Key, 32);//Create "input" string with master key
 		memcpy(TSNMICinput + 32, hash, 8);//Append first hash output to "input"
 		chaskeyMsgLen = 40;//Chaskey input is now 48 bytes
-		chaskey2(hash, TSNMICinput, ESSession_Key, chaskey1Subkey1, chaskey2Subkey2);
+		chaskey2(hash, TSNMICinput, SwSession_Key, chaskey1Subkey1, chaskey2Subkey2);
 	}//if
 
 	counter = 0;//Reset counter
 
 	memcpy(hash, v, hashLen);//copies |hash length| characters from memory area v to memory area hash  
-}//end_CHASKEY-12
+}//end_CHASKEY-12_SECOND
 //*****************************************************************************************************************************************************
 //---------------------------------------------------------------------------------------
 //                GET LIST OF INTERFACES FOR SENDING PACKET
