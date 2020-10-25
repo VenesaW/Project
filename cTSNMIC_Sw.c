@@ -2496,6 +2496,15 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		printf("\nCurrent toggle bit:%02x", toggleBit[0]);
 		printf("\nIncoming toggle bit:%02x", incomingToggleBit[0]);
 		
+		//Used to reset Toggle bit if it gets corrupted
+		if (incomingBit[0] == (0x00))
+		{
+			toggleVal = 0;
+		}
+		else {
+			toggleVal = 1;
+		}//endIF_ELSE
+			
 		//Key Change-Over
 		if (incomingToggleBit[0] != toggleBit[0])
 		{
@@ -2514,7 +2523,17 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			chaskeyMsgLen = 444;
 			chaskey2(hash, plaintext, curr_ESSession_Key, chaskey1Subkey1, chaskey2Subkey2);//pointer to returned chasekey mac calculation
 			printf("\nUpdating toggle bit...\n");
-			toggleBit[0] = incomingToggleBit[0];
+			
+			//Used to reset Toggle bit if it gets corrupted
+			if (toggleVal == 0)
+			{
+				toggleBit[0] = (0x01);//set to 1
+				toggleVal = 1;
+			}
+			else {
+				toggleBit[0] = (0x00);//set to 0
+				toggleVal = 0;
+			}//endIF_ELSE
 		}//endIF
 		
 		else if (incomingToggleBit[0] == toggleBit[0])
@@ -2525,7 +2544,15 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			counter = 0;
 			chaskeyMsgLen = 444;
 			chaskey(hash, plaintext, curr_ESSession_Key, chaskeySubkey1, chaskeySubkey2);//pointer to returned chasekey mac calculation
-			toggleBit[0] = incomingToggleBit[0];
+			
+			//Used to reset Toggle bit if it gets corrupted
+			if (toggleVal == 0)
+			{
+				toggleBit[0] = (0x00);//set to 0
+			}
+			else {
+				toggleBit[0] = (0x01);//set to 1
+			}//endIF_ELSE
 		}//endIF_ELSE
 
 		printf("\n\n");
@@ -2547,10 +2574,13 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		}//endFOR
 		
 		//Reset Toggle bit if it gets corrupted
-		if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
+		if (toggleVal == 0)
 		{
-			toggleBit[0] = (0x01);//set to 1
+			toggleBit[0] = (0x00);//set to 0
 		}
+		else {
+			toggleBit[0] = (0x01);//set to 0
+		}//endIF_ELSE
 		printf("\n\n");
 		integrityVal[3] = toggleBit[0];
 				
