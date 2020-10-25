@@ -2524,7 +2524,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		else {
 			curr_ESSession_Key = &ESSession_Key;
 			curr_SwSession_Key = &SwSession_Key;
-			//subkeys2(chaskey1Subkey1, chaskey2Subkey2, curr_ESSession_Key);//Generate subkeys
+			subkeys(chaskeySubkey1, chaskeySubkey2, curr_ESSession_Key);//Generate subkeys
 			
 			//MAC generation
 			//Calculate hash and compare to appended hash
