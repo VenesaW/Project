@@ -2632,6 +2632,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 					msgFlag[0] = (0x10);
 					exit(EXIT_FAILURE);//requires manual input
 				}
+			msgFlag[0] = (0x13);
 		}//endIF_ELSE*/
 		break;
 
