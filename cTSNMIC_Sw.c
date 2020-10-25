@@ -2509,6 +2509,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		if (incomingToggleBit[0] != toggleBit[0])
 		{
 			//update session key pointer
+			printf("\nNew Toggle Bit detected...updating key pointers\n");
 			old_ESSession_Key = &ESSession_Key;
 			curr_ESSession_Key = &ESSession_next_Key;
 			curr_SwSession_Key = &SwSession_Key;
