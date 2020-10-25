@@ -2491,6 +2491,17 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 		printf("\nCurrent toggle bit:%02x", toggleBit[0]);
 		printf("\nIncoming toggle bit:%02x", incomingToggleBit[0]);
 		
+		//Set Toggle Value
+		//Used to reset Toggle bit if it is later corrupted
+		if ((incomingToggleBit[0] 0= (0x00))
+		{
+			toggleVal = 0;
+		}
+		else {
+			toggleVal = 1;
+		}//endIF_ELSE
+		
+		//Key Change-Over
 		if (incomingToggleBit[0] != toggleBit[0])
 		{
 			//update session key pointer
@@ -2509,6 +2520,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			printf("\nUpdating toggle bit...\n");
 			toggleBit[0] = incomingToggleBit[0];
 		}//endIF
+		
 		else {
 			curr_ESSession_Key = &ESSession_Key;
 			curr_SwSession_Key = &SwSession_Key;
@@ -2545,6 +2557,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			integrityVal[getData] = hash[getData];
 		}//endFOR
 		
+		//Reset Toggle bit if it gets corrupted
 		if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
 		{
 			if (toggleVal == 0)
@@ -2574,6 +2587,7 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 				integrityVal[getData] = hash[getData];
 			}//endFOR
 			
+			//Reset Toggle bit if it gets corrupted
 			if ((toggleBit[0] != (0x00)) || (toggleBit[0] != (0x01)))
 			{
 				if (toggleVal == 0)
