@@ -2573,6 +2573,16 @@ void handleMsg(u_char *Uselesspointr, const struct pcap_pkthdr *header, const u_
 			integrityVal[getData] = hash[getData];
 		}//endFOR
 		
+		//Reset Toggle bit if it gets corrupted
+		if (toggleVal == 0)
+		{
+			toggleBit[0] = (0x00);//set to 0
+		}
+		else {
+			toggleBit[0] = (0x01);//set to 0
+		}//endIF_ELSE
+		printf("\n\n");
+		integrityVal[3] = toggleBit[0];
 				
 		//Compare Hashes
 		if ((0 == memcmp((char*)hashValue, (char*)integrityVal, HASH_LEN)))
